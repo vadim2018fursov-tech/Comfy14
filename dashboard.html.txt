@@ -1,0 +1,628 @@
+﻿<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Внутрішній портал • Метрики команди</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Roboto+Mono&amp;display=swap');
+        
+        :root {
+            --primary: #0f766e;
+        }
+        
+        body {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+        
+        .metric-value {
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        .performance-badge {
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+        }
+
+        .table-header {
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .table-header:hover {
+            background-color: #f8fafc;
+        }
+
+        .modal {
+            animation: modalPop 0.2s ease-out forwards;
+        }
+
+        @keyframes modalPop {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50">
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-x-3">
+                <div class="w-10 h-10 bg-teal-700 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-store text-white text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-semibold text-slate-900">Внутрішній портал</h1>
+                    <p class="text-sm text-slate-500">Метрики команди • Аналіз та покращення показників</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-x-4">
+                <div class="px-4 py-1.5 bg-slate-100 rounded-full text-sm flex items-center gap-x-2">
+                    <i class="fa-solid fa-users text-teal-700"></i>
+                    <span class="font-medium text-slate-700" id="employee-count">12 співробітників</span>
+                </div>
+                <button onclick="resetToDemoData()" 
+                        class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 flex items-center gap-x-2">
+                    <i class="fa-solid fa-undo"></i>
+                    <span>Скинути демо-дані</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-6 py-8">
+        
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white rounded-2xl p-5 border border-slate-200">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-slate-500">Середній бал команди</p>
+                        <p class="text-4xl font-semibold text-slate-900 mt-1" id="avg-score">87</p>
+                    </div>
+                    <div class="w-12 h-12 bg-teal-100 rounded-2xl flex items-center justify-center">
+                        <i class="fa-solid fa-chart-line text-teal-700 text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-2xl p-5 border border-slate-200">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-slate-500">На треку (≥85)</p>
+                        <p class="text-4xl font-semibold text-emerald-600 mt-1" id="on-track">8</p>
+                    </div>
+                    <div class="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center">
+                        <i class="fa-solid fa-check-double text-emerald-600 text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-2xl p-5 border border-slate-200">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-slate-500">Потребують уваги (&lt;70)</p>
+                        <p class="text-4xl font-semibold text-rose-600 mt-1" id="need-attention">2</p>
+                    </div>
+                    <div class="w-12 h-12 bg-rose-100 rounded-2xl flex items-center justify-center">
+                        <i class="fa-solid fa-exclamation-triangle text-rose-600 text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-2xl p-5 border border-slate-200">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-slate-500">Середня відвідуваність</p>
+                        <p class="text-4xl font-semibold text-slate-900 mt-1" id="avg-attendance">94</p>
+                        <p class="text-xs text-slate-500">%</p>
+                    </div>
+                    <div class="w-12 h-12 bg-amber-100 rounded-2xl flex items-center justify-center">
+                        <i class="fa-solid fa-calendar-check text-amber-600 text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="flex flex-col md:flex-row gap-4 mb-4 items-start md:items-center justify-between">
+            <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                <!-- Search -->
+                <div class="relative flex-1 md:w-80">
+                    <i class="fa-solid fa-search absolute left-4 top-3 text-slate-400"></i>
+                    <input type="text" id="search-input" placeholder="Пошук за ім'ям або фокусом..." 
+                           class="w-full pl-11 pr-4 py-2.5 border border-slate-300 rounded-2xl text-sm focus:outline-none focus:border-teal-700"
+                           oninput="filterAndRender()">
+                </div>
+                
+                <!-- Filters -->
+                <select id="role-filter" onchange="filterAndRender()" 
+                        class="border border-slate-300 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-teal-700">
+                    <option value="">Всі ролі</option>
+                    <option value="Продавець-консультант">Продавець-консультант</option>
+                    <option value="Касир">Касир</option>
+                    <option value="Менеджер залу">Менеджер залу</option>
+                    <option value="Склад">Склад</option>
+                </select>
+                
+                <select id="performance-filter" onchange="filterAndRender()" 
+                        class="border border-slate-300 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:border-teal-700">
+                    <option value="">Всі рівні</option>
+                    <option value="high">Високий (≥85)</option>
+                    <option value="medium">Середній (70-84)</option>
+                    <option value="low">Низький (&lt;70)</option>
+                </select>
+            </div>
+            
+            <button onclick="openAddModal()" 
+                    class="flex items-center gap-x-2 bg-teal-700 hover:bg-teal-800 transition-colors text-white px-5 py-2.5 rounded-2xl text-sm font-medium">
+                <i class="fa-solid fa-plus"></i>
+                <span>Додати співробітника</span>
+            </button>
+        </div>
+
+        <!-- Table -->
+        <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
+            <table class="w-full">
+                <thead class="bg-slate-50 border-b border-slate-200">
+                    <tr>
+                        <th onclick="sortTable('name')" class="table-header px-6 py-4 text-left text-xs font-semibold text-slate-600 tracking-wider">ПІБ</th>
+                        <th onclick="sortTable('role')" class="table-header px-6 py-4 text-left text-xs font-semibold text-slate-600 tracking-wider">Роль / Відділ</th>
+                        <th onclick="sortTable('salesTargetPercent')" class="table-header px-6 py-4 text-center text-xs font-semibold text-slate-600 tracking-wider">% плану продажів</th>
+                        <th onclick="sortTable('customerSatisfaction')" class="table-header px-6 py-4 text-center text-xs font-semibold text-slate-600 tracking-wider">Задоволеність клієнтів</th>
+                        <th onclick="sortTable('attendance')" class="table-header px-6 py-4 text-center text-xs font-semibold text-slate-600 tracking-wider">Відвідуваність</th>
+                        <th onclick="sortTable('performanceScore')" class="table-header px-6 py-4 text-center text-xs font-semibold text-slate-600 tracking-wider">Performance Score</th>
+                        <th onclick="sortTable('itemsPerHour')" class="table-header px-6 py-4 text-center text-xs font-semibold text-slate-600 tracking-wider">Товарів/год</th>
+                        <th class="px-6 py-4 text-center text-xs font-semibold text-slate-600 tracking-wider">Дії</th>
+                    </tr>
+                </thead>
+                <tbody id="employees-table" class="divide-y divide-slate-100 text-sm">
+                    <!-- JS renders rows here -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-4 text-xs text-slate-500 flex items-center gap-x-2">
+            <i class="fa-solid fa-info-circle"></i>
+            <span>Клік по заголовку стовпця — сортування. Дані зберігаються тільки на цьому пристрої.</span>
+        </div>
+    </div>
+
+    <!-- Edit / Add Modal -->
+    <div id="modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl w-full max-w-lg modal shadow-xl">
+            <div class="px-6 pt-6 pb-4 border-b flex items-center justify-between">
+                <h3 id="modal-title" class="text-xl font-semibold text-slate-900">Редагувати метрики</h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-times text-2xl"></i>
+                </button>
+            </div>
+            
+            <div class="p-6 space-y-5">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-500 mb-1.5">ПІБ</label>
+                        <input type="text" id="modal-name" class="w-full border border-slate-300 rounded-2xl px-4 py-2.5 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-500 mb-1.5">Роль</label>
+                        <select id="modal-role" class="w-full border border-slate-300 rounded-2xl px-4 py-2.5 text-sm">
+                            <option>Продавець-консультант</option>
+                            <option>Касир</option>
+                            <option>Менеджер залу</option>
+                            <option>Склад</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-500 mb-1.5">% виконання плану продажів</label>
+                        <input type="number" id="modal-sales" class="w-full border border-slate-300 rounded-2xl px-4 py-2.5 text-sm" min="0" max="200">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-500 mb-1.5">Задоволеність клієнтів (1-10)</label>
+                        <input type="number" id="modal-satisfaction" step="0.1" class="w-full border border-slate-300 rounded-2xl px-4 py-2.5 text-sm" min="1" max="10">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-500 mb-1.5">Відвідуваність %</label>
+                        <input type="number" id="modal-attendance" class="w-full border border-slate-300 rounded-2xl px-4 py-2.5 text-sm" min="0" max="100">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-500 mb-1.5">Performance Score</label>
+                        <input type="number" id="modal-performance" class="w-full border border-slate-300 rounded-2xl px-4 py-2.5 text-sm" min="0" max="100">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-500 mb-1.5">Товарів за годину</label>
+                        <input type="number" id="modal-items" class="w-full border border-slate-300 rounded-2xl px-4 py-2.5 text-sm" min="0">
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-xs font-medium text-slate-500 mb-1.5">Фокус покращення (рекомендація)</label>
+                    <textarea id="modal-focus" rows="2" class="w-full border border-slate-300 rounded-2xl px-4 py-2.5 text-sm resize-y"></textarea>
+                </div>
+            </div>
+            
+            <div class="px-6 py-4 bg-slate-50 rounded-b-3xl flex justify-end gap-x-3">
+                <button onclick="closeModal()" 
+                        class="px-5 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-2xl">Скасувати</button>
+                <button onclick="saveEmployee()" 
+                        class="px-6 py-2.5 bg-teal-700 hover:bg-teal-800 transition-colors text-white text-sm font-semibold rounded-2xl flex items-center gap-x-2">
+                    <i class="fa-solid fa-save"></i>
+                    <span>Зберегти зміни</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== ДАНІ ====================
+        let employees = [];
+        let currentSort = { key: 'performanceScore', direction: 'desc' };
+        let currentEmployeeId = null;
+
+        // Демо-дані (реалістичні для магазину в Києві)
+        const demoEmployees = [
+            {
+                id: 1,
+                name: "Олена Коваленко",
+                role: "Продавець-консультант",
+                department: "Торговий зал",
+                salesTargetPercent: 112,
+                customerSatisfaction: 9.2,
+                attendance: 98,
+                performanceScore: 91,
+                itemsPerHour: 24,
+                lastReview: "2026-05-15",
+                improvementFocus: "Активніше пропонувати додаткові товари"
+            },
+            {
+                id: 2,
+                name: "Максим Петренко",
+                role: "Касир",
+                department: "Торговий зал",
+                salesTargetPercent: 78,
+                customerSatisfaction: 7.8,
+                attendance: 95,
+                performanceScore: 68,
+                itemsPerHour: 31,
+                lastReview: "2026-04-20",
+                improvementFocus: "Швидкість обслуговування та точність"
+            },
+            {
+                id: 3,
+                name: "Анна Шевченко",
+                role: "Продавець-консультант",
+                department: "Торговий зал",
+                salesTargetPercent: 95,
+                customerSatisfaction: 8.7,
+                attendance: 92,
+                performanceScore: 84,
+                itemsPerHour: 19,
+                lastReview: "2026-05-28",
+                improvementFocus: "Робота з запереченнями клієнтів"
+            },
+            {
+                id: 4,
+                name: "Дмитро Бондаренко",
+                role: "Менеджер залу",
+                department: "Торговий зал",
+                salesTargetPercent: 105,
+                customerSatisfaction: 9.0,
+                attendance: 100,
+                performanceScore: 93,
+                itemsPerHour: 15,
+                lastReview: "2026-06-01",
+                improvementFocus: "Мотивація команди та делегування"
+            },
+            {
+                id: 5,
+                name: "Ірина Мельник",
+                role: "Склад",
+                department: "Склад",
+                salesTargetPercent: 65,
+                customerSatisfaction: 6.5,
+                attendance: 88,
+                performanceScore: 59,
+                itemsPerHour: 42,
+                lastReview: "2026-03-10",
+                improvementFocus: "Точність комплектації та швидкість"
+            }
+        ];
+
+        // ==================== LOCALSTORAGE ====================
+        function loadEmployees() {
+            const saved = localStorage.getItem('storeEmployees');
+            if (saved) {
+                employees = JSON.parse(saved);
+            } else {
+                employees = [...demoEmployees];
+                saveEmployees();
+            }
+        }
+
+        function saveEmployees() {
+            localStorage.setItem('storeEmployees', JSON.stringify(employees));
+        }
+
+        function resetToDemoData() {
+            if (confirm('Скинути всі дані до демонстраційних?')) {
+                employees = [...demoEmployees];
+                saveEmployees();
+                filterAndRender();
+            }
+        }
+
+        // ==================== РЕНДЕР ====================
+        function renderKPIs() {
+            const scores = employees.map(e => e.performanceScore);
+            const avg = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+            const onTrack = employees.filter(e => e.performanceScore >= 85).length;
+            const needAttention = employees.filter(e => e.performanceScore < 70).length;
+            const avgAttendance = employees.length ? 
+                Math.round(employees.reduce((a, b) => a + b.attendance, 0) / employees.length) : 0;
+
+            document.getElementById('avg-score').textContent = avg;
+            document.getElementById('on-track').textContent = onTrack;
+            document.getElementById('need-attention').textContent = needAttention;
+            document.getElementById('avg-attendance').textContent = avgAttendance;
+            document.getElementById('employee-count').textContent = `${employees.length} співробітників`;
+        }
+
+        function getPerformanceColor(score) {
+            if (score >= 85) return 'bg-emerald-100 text-emerald-700';
+            if (score >= 70) return 'bg-amber-100 text-amber-700';
+            return 'bg-rose-100 text-rose-700';
+        }
+
+        function renderTable(filteredEmployees) {
+            const tbody = document.getElementById('employees-table');
+            tbody.innerHTML = '';
+
+            if (filteredEmployees.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="px-6 py-12 text-center text-slate-500">
+                            <i class="fa-solid fa-search text-3xl mb-3 block"></i>
+                            Співробітників не знайдено
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            filteredEmployees.forEach(emp => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-slate-50 transition-colors';
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4">
+                        <div class="font-medium text-slate-900">${emp.name}</div>
+                        <div class="text-xs text-slate-500">${emp.department}</div>
+                    </td>
+                    <td class="px-6 py-4 text-slate-600">${emp.role}</td>
+                    <td class="px-6 py-4 text-center">
+                        <span class="font-medium">${emp.salesTargetPercent}%</span>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <span class="font-medium">${emp.customerSatisfaction}</span>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <span class="font-medium">${emp.attendance}%</span>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <span class="performance-badge ${getPerformanceColor(emp.performanceScore)}">
+                            ${emp.performanceScore}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-center font-medium">${emp.itemsPerHour}</td>
+                    <td class="px-6 py-4">
+                        <div class="flex justify-center gap-x-2">
+                            <button onclick="openEditModal(${emp.id})" 
+                                    class="px-3 py-1.5 text-xs font-medium bg-white border border-slate-300 hover:bg-slate-50 rounded-xl flex items-center gap-x-1.5">
+                                <i class="fa-solid fa-edit text-teal-700"></i>
+                                <span class="hidden sm:inline">Редагувати</span>
+                            </button>
+                            <button onclick="markForCoaching(${emp.id})" 
+                                    class="px-3 py-1.5 text-xs font-medium bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-xl flex items-center gap-x-1.5">
+                                <i class="fa-solid fa-user-graduate"></i>
+                                <span class="hidden sm:inline">Коучинг</span>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function filterAndRender() {
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const roleFilter = document.getElementById('role-filter').value;
+            const perfFilter = document.getElementById('performance-filter').value;
+
+            let filtered = employees;
+
+            // Пошук
+            if (search) {
+                filtered = filtered.filter(emp => 
+                    emp.name.toLowerCase().includes(search) || 
+                    (emp.improvementFocus && emp.improvementFocus.toLowerCase().includes(search))
+                );
+            }
+
+            // Фільтр по ролі
+            if (roleFilter) {
+                filtered = filtered.filter(emp => emp.role === roleFilter);
+            }
+
+            // Фільтр по рівню performance
+            if (perfFilter === 'high') {
+                filtered = filtered.filter(emp => emp.performanceScore >= 85);
+            } else if (perfFilter === 'medium') {
+                filtered = filtered.filter(emp => emp.performanceScore >= 70 && emp.performanceScore < 85);
+            } else if (perfFilter === 'low') {
+                filtered = filtered.filter(emp => emp.performanceScore < 70);
+            }
+
+            // Сортування
+            filtered.sort((a, b) => {
+                let valA = a[currentSort.key];
+                let valB = b[currentSort.key];
+                
+                if (typeof valA === 'string') {
+                    return currentSort.direction === 'asc' 
+                        ? valA.localeCompare(valB) 
+                        : valB.localeCompare(valA);
+                } else {
+                    return currentSort.direction === 'asc' ? valA - valB : valB - valA;
+                }
+            });
+
+            renderTable(filtered);
+        }
+
+        function sortTable(key) {
+            if (currentSort.key === key) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.key = key;
+                currentSort.direction = key === 'name' ? 'asc' : 'desc';
+            }
+            filterAndRender();
+        }
+
+        // ==================== МОДАЛЬНЕ ВІКНО ====================
+        function openEditModal(id) {
+            const emp = employees.find(e => e.id === id);
+            if (!emp) return;
+
+            currentEmployeeId = id;
+            document.getElementById('modal-title').textContent = 'Редагувати метрики';
+            
+            // Заповнюємо форму
+            document.getElementById('modal-name').value = emp.name;
+            document.getElementById('modal-role').value = emp.role;
+            document.getElementById('modal-sales').value = emp.salesTargetPercent;
+            document.getElementById('modal-satisfaction').value = emp.customerSatisfaction;
+            document.getElementById('modal-attendance').value = emp.attendance;
+            document.getElementById('modal-performance').value = emp.performanceScore;
+            document.getElementById('modal-items').value = emp.itemsPerHour;
+            document.getElementById('modal-focus').value = emp.improvementFocus || '';
+
+            document.getElementById('modal').classList.remove('hidden');
+            document.getElementById('modal').classList.add('flex');
+        }
+
+        function openAddModal() {
+            currentEmployeeId = null;
+            document.getElementById('modal-title').textContent = 'Додати нового співробітника';
+            
+            // Очищаємо форму
+            document.getElementById('modal-name').value = '';
+            document.getElementById('modal-role').value = 'Продавець-консультант';
+            document.getElementById('modal-sales').value = '100';
+            document.getElementById('modal-satisfaction').value = '8.0';
+            document.getElementById('modal-attendance').value = '95';
+            document.getElementById('modal-performance').value = '80';
+            document.getElementById('modal-items').value = '20';
+            document.getElementById('modal-focus').value = '';
+
+            document.getElementById('modal').classList.remove('hidden');
+            document.getElementById('modal').classList.add('flex');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('flex');
+            document.getElementById('modal').classList.add('hidden');
+        }
+
+        function saveEmployee() {
+            const name = document.getElementById('modal-name').value.trim();
+            if (!name) {
+                alert('Введіть ПІБ співробітника');
+                return;
+            }
+
+            const newData = {
+                name: name,
+                role: document.getElementById('modal-role').value,
+                salesTargetPercent: parseInt(document.getElementById('modal-sales').value) || 0,
+                customerSatisfaction: parseFloat(document.getElementById('modal-satisfaction').value) || 0,
+                attendance: parseInt(document.getElementById('modal-attendance').value) || 0,
+                performanceScore: parseInt(document.getElementById('modal-performance').value) || 0,
+                itemsPerHour: parseInt(document.getElementById('modal-items').value) || 0,
+                improvementFocus: document.getElementById('modal-focus').value.trim()
+            };
+
+            if (currentEmployeeId) {
+                // Редагування
+                const index = employees.findIndex(e => e.id === currentEmployeeId);
+                employees[index] = { ...employees[index], ...newData };
+            } else {
+                // Новий співробітник
+                const newId = Math.max(0, ...employees.map(e => e.id)) + 1;
+                employees.push({
+                    id: newId,
+                    department: 'Торговий зал',
+                    lastReview: new Date().toISOString().split('T')[0],
+                    ...newData
+                });
+            }
+
+            saveEmployees();
+            closeModal();
+            filterAndRender();
+            renderKPIs();
+        }
+
+        function markForCoaching(id) {
+            const emp = employees.find(e => e.id === id);
+            if (!emp) return;
+
+            if (confirm(`Відмітити ${emp.name} для коучингу?`)) {
+                emp.improvementFocus = emp.improvementFocus 
+                    ? emp.improvementFocus + ' | Потребує коучингу' 
+                    : 'Потребує коучингу (низькі показники)';
+                
+                saveEmployees();
+                filterAndRender();
+                
+                // Показуємо рекомендацію
+                setTimeout(() => {
+                    alert(`Рекомендація для ${emp.name}:\n• Провести індивідуальну розмову\n• Поставити чіткі цілі на тиждень\n• Контролювати прогрес через 7 днів`);
+                }, 300);
+            }
+        }
+
+        // ==================== ІНІЦІАЛІЗАЦІЯ ====================
+        function init() {
+            loadEmployees();
+            
+            // Початковий рендер
+            filterAndRender();
+            renderKPIs();
+            
+            // Додаємо слухачі для сортування (вже є onclick в HTML)
+            // Додатковий обробник для Enter в пошуку
+            document.getElementById('search-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') filterAndRender();
+            });
+            
+            // Початкове сортування за performance
+            currentSort = { key: 'performanceScore', direction: 'desc' };
+        }
+
+        // Запускаємо додаток
+        window.onload = init;
+    </script>
+</body>
+</html>

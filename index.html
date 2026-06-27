@@ -5,6 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Comfy Сервіс Керівник — Панель Магазину</title>
     <link rel="manifest" href="manifest.json">
+    <!-- Подключение библиотеки Chart.js для графиков -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Подключение Tailwind CSS для кастомного интерфейса (включая Gemini и Карточки команды) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        comfyGreen: '#45c735',
+                        comfyGreenHover: '#3cb02e',
+                        comfyOrange: '#ff6c00',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         :root {
             --comfy-main-bg: #f3f4f6;       
@@ -24,7 +42,7 @@
             --transition-speed: 0.3s;
         }
 
-        /* Dark Mode Colors */
+        /* Темная тема */
         body.dark-mode {
             --comfy-main-bg: #0f1113;
             --comfy-card-bg: #181b1f;
@@ -55,7 +73,7 @@
             overflow-x: hidden;
         }
 
-        /* Ambient subtle grid background */
+        /* Фоновая сетка */
         body::before {
             content: '';
             position: fixed;
@@ -209,11 +227,10 @@
         }
         
         .sidebar-brand { 
-            padding: 20px; 
+            padding: 20px 20px 10px 20px; 
             font-size: 24px; 
             font-weight: 900; 
             white-space: nowrap; 
-            border-bottom: 1px solid #2d3238; 
             text-align: left; 
             color: #fff; 
             letter-spacing: -0.5px;
@@ -230,7 +247,7 @@
         
         .sidebar-menu { 
             list-style: none; 
-            margin-top: 20px; 
+            margin-top: 10px; 
             flex-grow: 1; 
             overflow-y: auto;
         }
@@ -294,7 +311,7 @@
         h2 { margin-bottom: 20px; color: var(--comfy-dark); font-size: 22px; font-weight: 800; letter-spacing: -0.7px; line-height: 1.2; }
         h3 { margin: 28px 0 16px 0; color: var(--comfy-dark); font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 10px; letter-spacing: -0.3px; }
 
-        /* ADVANCED GLOWING LEADERS CARD EFFECTS */
+        /* Лидеры */
         .leaders-row { 
             display: grid; 
             grid-template-columns: 1fr; 
@@ -357,7 +374,6 @@
             transform: scale(1.08) rotate(5deg);
         }
         
-        /* Specific glowing borders for rank */
         .leader-card:nth-child(1) .leader-avatar-container { 
             border-color: #ffca28; 
             box-shadow: 0 0 14px rgba(255, 202, 40, 0.4); 
@@ -391,7 +407,7 @@
         .leader-card .name { font-size: 16px; font-weight: 800; color: var(--comfy-dark); }
         .leader-card .category-title { font-size: 11px; color: var(--comfy-muted); text-transform: uppercase; font-weight: 700; margin-top: 4px; letter-spacing: 0.6px; }
 
-        /* PULSING ALERT LIGHT FOR AI PANELS */
+        /* ИИ подсказки */
         .ai-alerts-box { 
             background: #fffde7; 
             border: 1px solid #fff59d; 
@@ -437,22 +453,6 @@
             100% { transform: scale(0.9); opacity: 0; box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); }
         }
 
-        .service-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
-        .service-card { 
-            background: var(--comfy-card-bg); 
-            border: 2px solid var(--comfy-border); 
-            border-radius: 16px; 
-            padding: 20px; 
-            transition: all var(--transition-speed); 
-        }
-        .service-card:hover {
-            transform: translateY(-3px);
-            border-color: var(--comfy-green);
-            box-shadow: var(--shadow-sm);
-        }
-        .service-card h4 { color: var(--comfy-dark); margin-bottom: 12px; font-size: 16px; font-weight: 800; }
-        .service-card .desc-text { color: var(--comfy-text); font-size: 14px; line-height: 1.6; white-space: pre-line; opacity: 0.85; }
-
         .table-container { 
             width: 100%; 
             overflow-x: auto; 
@@ -476,6 +476,44 @@
         tr:last-child td { border-bottom: none; }
         tr:hover td { background-color: rgba(248, 250, 252, 0.02); }
         
+        /* Адаптивный формат таблицы для мобильных */
+        @media (max-width: 767px) {
+            #format-main-table, #format-main-table tbody, #format-main-table tr, #format-main-table td {
+                display: block;
+                width: 100%;
+            }
+            #format-main-table thead {
+                display: none; 
+            }
+            #format-main-table tr {
+                margin-bottom: 16px;
+                border: 1px solid var(--comfy-border);
+                border-radius: 16px;
+                padding: 12px;
+                background: var(--comfy-card-bg);
+                box-shadow: var(--shadow-sm);
+            }
+            #format-main-table td {
+                border-bottom: 1px dashed var(--comfy-border);
+                padding: 10px 4px;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+            #format-main-table td:last-child {
+                border-bottom: none;
+            }
+            #format-main-table td::before {
+                content: attr(data-label);
+                font-size: 10px;
+                text-transform: uppercase;
+                color: var(--comfy-muted);
+                font-weight: 800;
+                letter-spacing: 0.5px;
+            }
+        }
+
         input[type="text"], input[type="number"], select, textarea { 
             width: 100%; 
             padding: 10px 12px; 
@@ -551,7 +589,7 @@
         .badge-pro { background-color: var(--comfy-orange); }
         .badge-rookie { background-color: #3b82f6; }
         
-        /* MODERN CHECKLIST CONTAINER STYLING */
+        /* Чек-листы */
         .checklist-container {
             margin-top: 30px;
             padding: 22px;
@@ -589,7 +627,6 @@
             color: white;
         }
         
-        /* Ripple-like effect on checking tasks */
         .checklist-item {
             display: flex;
             align-items: center;
@@ -652,6 +689,7 @@
         body.admin-mode table .admin-only { display: table-cell !important; }
         body.admin-mode tr.admin-only { display: table-row !important; }
         body.admin-mode li.admin-only { display: flex !important; }
+        body.admin-mode div.admin-only { display: block !important; }
 
         .form-group { margin-bottom: 16px; }
         .form-group label { display: block; margin-bottom: 6px; font-weight: 800; font-size: 14px; color: var(--comfy-dark); }
@@ -737,7 +775,7 @@
             transform: scale(1.3);
         }
 
-        /* SHIMMER EFFECT FOR AI RECALCULATION Loading */
+        /* Загрузка ШИ */
         .ai-shimmer-container {
             position: relative;
         }
@@ -803,6 +841,232 @@
             display: none;
         }
 
+        /* =========================================
+           Карусель полупрозрачных карточек
+           ========================================= */
+        .carousel-wrapper {
+            position: relative;
+            width: 100%;
+            margin-top: 15px;
+        }
+        
+        .carousel-container {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding: 10px 4px 25px 4px;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none; 
+            -webkit-overflow-scrolling: touch;
+            border-radius: 16px;
+        }
+        
+        .carousel-container::-webkit-scrollbar {
+            display: none; 
+        }
+
+        .service-carousel-card {
+            flex: 0 0 85vw;
+            max-width: 310px;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 24px;
+            padding: 18px;
+            scroll-snap-align: center;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-sizing: border-box;
+        }
+        
+        body.dark-mode .service-carousel-card {
+            background: rgba(24, 27, 31, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+        
+        .service-carousel-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.12);
+        }
+        
+        body.dark-mode .service-carousel-card:hover {
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
+        }
+
+        .card-category-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 2px;
+        }
+        
+        .card-category-header h3 {
+            margin: 0 !important;
+            font-size: 20px !important;
+            font-weight: 800;
+            color: var(--comfy-dark);
+        }
+        
+        .category-icon {
+            font-size: 24px;
+        }
+        
+        .carousel-services-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow-y: auto;
+            max-height: 380px; 
+            padding-right: 4px;
+        }
+        
+        .carousel-services-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        .carousel-services-list::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 2px;
+        }
+        body.dark-mode .carousel-services-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .carousel-service-item {
+            background: rgba(255, 255, 255, 0.35);
+            border-radius: 14px;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            transition: background 0.2s;
+        }
+        
+        body.dark-mode .carousel-service-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .carousel-service-item:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+        
+        body.dark-mode .carousel-service-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+        
+        .item-name {
+            font-weight: 800;
+            font-size: 13px;
+            color: var(--comfy-dark);
+            line-height: 1.2;
+        }
+        
+        .item-price {
+            background: var(--comfy-green);
+            color: #1f2226;
+            font-size: 11px;
+            font-weight: 900;
+            padding: 3px 8px;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+        
+        body.dark-mode .item-price {
+            background: var(--comfy-green);
+            color: #000;
+        }
+        
+        .item-work {
+            font-size: 11px;
+            color: var(--comfy-text);
+            opacity: 0.9;
+            line-height: 1.35;
+        }
+        
+        .item-work strong {
+            color: var(--comfy-dark);
+            font-weight: 700;
+        }
+
+        /* Анимации Toasts */
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes toastOut {
+            from { opacity: 1; transform: translateY(0) scale(1); }
+            to { opacity: 0; transform: translateY(15px) scale(0.95); }
+        }
+        @keyframes modalScaleIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Адаптивные стили для печати PDF-отчета */
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+            }
+            .sidebar, .mobile-header, .sidebar-overlay, .no-print, header, footer, button, .btn {
+                display: none !important;
+            }
+            .main-content {
+                margin-left: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+            }
+            .section {
+                display: none !important;
+            }
+            #strategy-presentation-modal {
+                display: flex !important;
+                position: static !important;
+                background: white !important;
+                color: black !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+                height: auto !important;
+                overflow: visible !important;
+                z-index: auto !important;
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+            }
+            #strategy-presentation-modal > div {
+                background: white !important;
+                color: black !important;
+                border: none !important;
+                box-shadow: none !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            #slide-printable-content * {
+                color: black !important;
+                border-color: #cbd5e1 !important;
+            }
+            .text-comfyGreen, .text-indigo-300 {
+                color: #1e3a8a !important; 
+            }
+            .bg-slate-800\/50, .bg-slate-900\/60, .bg-slate-900\/40 {
+                background: #f8fafc !important;
+                border: 1px solid #e2e8f0 !important;
+            }
+        }
+
         @media (min-width: 768px) {
             .leaders-row { 
                 grid-template-columns: repeat(3, 1fr); 
@@ -814,6 +1078,9 @@
             .btn {
                 width: auto;
             }
+            .service-carousel-card {
+                flex: 0 0 300px;
+            }
         }
 
         @media (min-width: 1025px) {
@@ -822,47 +1089,152 @@
             }
         }
     </style>
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- ==================== SUPABASE ==================== -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+    // === НАЛАШТУВАННЯ SUPABASE (заміни на свої значення) ===
+    const SUPABASE_URL = 'https://wpmeszwbkglulayaxfmn.supabase.co/rest/v1/';     // ← ВСТАВ СЮДИ Project URL
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndwbWVzendia2dsdWxheWF4Zm1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwODMyMDAsImV4cCI6MjA5NjY1OTIwMH0.nMRtU-33oF4Uw66iMxonvK6nMO4Up8S3hpvfDkPQfuE'; // ← ВСТАВ СЮДИ anon ключ
+
+    let supabaseClient = null;
+
+    function initSupabase() {
+        if (!SUPABASE_URL.includes('supabase.co') || SUPABASE_ANON_KEY.length < 30) {
+            console.warn('%c[Supabase] Ключі не вставлені або неправильні', 'color: orange');
+            return false;
+        }
+        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('%c[Supabase] Підключено успішно', 'color: #22c55e');
+        return true;
+    }
+
+    // === ФУНКЦІЇ ЗБЕРЕЖЕННЯ ТА ЗАВАНТАЖЕННЯ ===
+    async function loadAllDataFromCloud() {
+        if (!supabaseClient) return false;
+        try {
+            const { data, error } = await supabaseClient
+                .from('store_data')
+                .select('*')
+                .eq('id', 'main')
+                .single();
+
+            if (error && error.code !== 'PGRST116') {
+                console.error('[Supabase] Помилка завантаження:', error);
+                return false;
+            }
+            if (data && data.data) {
+                console.log('%c[Supabase] Дані завантажено з хмари', 'color: #22c55e');
+                return data.data;
+            }
+            return false;
+        } catch (err) {
+            console.error('[Supabase] Помилка:', err);
+            return false;
+        }
+    }
+
+    async function saveAllDataToCloud(silent = false) {
+        if (!supabaseClient) {
+            if (!silent) showToast('Supabase не підключено', 'error');
+            return false;
+        }
+        try {
+            const allData = {
+                staff: staff,
+                leaders: leaders,
+                servicesCarousel: servicesCarousel,
+                lastUpdated: new Date().toISOString()
+            };
+
+            const { error } = await supabaseClient
+                .from('store_data')
+                .upsert({
+                    id: 'main',
+                    data: allData,
+                    updated_at: new Date().toISOString()
+                });
+
+            if (error) {
+                console.error('[Supabase] Помилка збереження:', error);
+                if (!silent) showToast('Помилка збереження в хмару', 'error');
+                return false;
+            }
+            if (!silent) showToast('Дані збережено в хмару');
+            return true;
+        } catch (err) {
+            console.error('[Supabase] Помилка:', err);
+            return false;
+        }
+    }
+</script>
 </head>
 <body>
 
-    <!-- MOBILE NAVIGATION HEADER -->
+    <!-- МОБІЛЬНИЙ ЗАГОЛОВОК МЕРЕЖІ -->
     <header class="mobile-header">
         <button class="menu-toggle-btn" onclick="toggleMobileMenu()">☰</button>
-        <div class="mobile-header-brand">COMFY <span>PRO</span></div>
+        <div class="mobile-header-brand" style="display: flex; flex-direction: column; align-items: flex-start; line-height: 1.1;">
+            <div>COMFY <span>PRO</span></div>
+        </div>
         <button class="theme-toggle-btn" onclick="toggleTheme()">🌓</button>
     </header>
 
-    <!-- BACKDROP BLUR OVERLAY FOR MOBILE SIDEBAR -->
+    <!-- ТЕМНА ПІДКЛАДКА ДЛЯ МОБІЛЬНОГО МЕНЮ -->
     <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleMobileMenu()"></div>
 
-    <!-- CONFETTI EFFECT CANVAS -->
+    <!-- КОНФЕТТІ ХОЛСТ -->
     <canvas id="confetti-canvas"></canvas>
 
-    <!-- SIDEBAR -->
+    <!-- КАСТОМНИЙ ДІАЛОГ ПІДТВЕРДЖЕННЯ -->
+    <div id="comfy-confirm-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px); z-index:9999; justify-content:center; align-items:center; opacity:0; transition:opacity 0.2s ease;">
+        <div style="background:var(--comfy-card-bg); border:1px solid var(--comfy-border); padding:24px; border-radius:20px; max-width:400px; width:90%; box-shadow:var(--shadow-md); animation: modalScaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); text-align:center;">
+            <h4 style="margin-bottom:12px; font-weight:800; font-size:18px; color:var(--comfy-dark);" id="confirm-modal-title">Дія</h4>
+            <p style="color:var(--comfy-muted); font-size:14px; margin-bottom:24px; font-weight:600;" id="confirm-modal-text">Ви дійсно хочете продовжити?</p>
+            <div style="display:flex; gap:12px;">
+                <button class="btn" style="flex:1; background:var(--comfy-border); color:var(--comfy-text);" id="confirm-cancel-btn">Скасувати</button>
+                <button class="btn btn-danger" style="flex:1;" id="confirm-ok-btn">Підтвердити</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- БОКОВЕ МЕНЮ (SIDEBAR) -->
     <div class="sidebar" id="sidebar">
         <button class="sidebar-close-btn" onclick="toggleMobileMenu()">✕</button>
-        <div class="sidebar-brand">COMFY <span>PRO</span></div>
-        <ul class="sidebar-menu">
-            <li id="m-dashboard" class="active-menu-item" onclick="showSection('dashboard')"><span class="icon">🏆</span>Головна / Лідери</li>
-            <li id="m-format" onclick="showSection('format')"><span class="icon">🏢</span>Формат</li>
-            <li id="m-plans" onclick="showSection('plans')"><span class="icon">👤</span>Персональні плани</li>
-            <li id="m-our-services" onclick="showSection('our-services')"><span class="icon">💼</span>Наші сервіси & Продажі</li>
-            <li id="m-auto-dist" class="admin-only" onclick="showSection('auto-dist')"><span class="icon">🤖</span>Розподіл плану</li>
-            <li id="m-share" onclick="showSection('share')"><span class="icon">📈</span>Рейтинг & Частки</li>
-            <li id="m-training" onclick="showSection('training')"><span class="icon">🎓</span>Навчання та контроль</li>
-            <li id="m-calendar" onclick="showSection('calendar')"><span class="icon">📅</span>Графік & Задачі</li>
-            <li id="m-strategy" class="admin-only" onclick="showSection('strategy')"><span class="icon">🛡️</span>Стратегія</li>
-            <li id="m-action-now" onclick="showSection('action-now')"><span class="icon">⚡</span>Конструктор Дня</li>
-        </ul>
-        <div class="admin-lock-btn" onclick="toggleAdminMode()">
-            <span class="icon" id="lock-icon">🔒</span>
-            <span style="margin-left:15px; font-weight:800; font-size:13px; text-transform: uppercase;" id="lock-text">Панель Керівника</span>
+        <div>
+            <div class="sidebar-brand">COMFY <span>PRO</span></div>
+            <ul class="sidebar-menu">
+                <li id="m-dashboard" class="active-menu-item" onclick="showSection('dashboard')"><span class="icon">🏆</span>Головна / Лідери</li>
+                <li id="m-format" onclick="showSection('format')"><span class="icon">🏢</span>Формат</li>
+                <li id="m-plans" onclick="showSection('plans')"><span class="icon">👤</span>Персональні плани</li>
+                <li id="m-our-services" onclick="showSection('our-services')"><span class="icon">💼</span>Наші сервіси</li>
+                <li id="m-auto-dist" class="admin-only" onclick="showSection('auto-dist')"><span class="icon">🤖</span>Розподіл плану</li>
+                <li id="m-share" onclick="showSection('share')"><span class="icon">📈</span>Рейтинг та частки</li>
+                <li id="m-team-hub" onclick="showSection('team-hub')"><span class="icon">👥</span>Команда та Розвиток</li>
+                <li id="m-strategy" class="admin-only" onclick="showSection('strategy')"><span class="icon">🛡️</span>Стратегія</li>
+                <li id="m-action-now" onclick="showSection('action-now')"><span class="icon">⚡</span>Конструктор дня</li>
+            </ul>
+        </div>
+        
+        <!-- НИЖНЯ ЧАСТИНА САЙДБАРУ З КНОПКОЮ ТА СИНХРОНІЗАЦІЄЮ -->
+        <div style="display: flex; flex-direction: column;">
+            <div class="admin-lock-btn" onclick="toggleAdminMode()">
+                <span class="icon" id="lock-icon">🔒</span>
+                <span style="margin-left:15px; font-weight:800; font-size:13px; text-transform: uppercase;" id="lock-text">Панель Керівника</span>
+            </div>
+            <!-- Обновленный неброский статус синхронизации -->
+            <div id="cloud-status-sidebar" style="padding: 10px 20px; font-size: 10px; font-weight: 500; display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.15); color: #7f8c99;">
+                <span class="cloud-indicator-dot" style="width: 6px; height: 6px; border-radius: 50%; background: #7f8c99;"></span>
+                <span class="cloud-indicator-text">Автономний режим</span>
+            </div>
         </div>
     </div>
 
     <div class="main-content">
 
-        <!-- DASHBOARD SECTION -->
+        <!-- ГОЛОВНИЙ ЕКРАН (DASHBOARD) -->
         <div id="dashboard" class="section active">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
                 <h2>🏆 Управління сервісними показниками</h2>
@@ -876,11 +1248,11 @@
                 <h4 style="margin-bottom:10px; color:#5d4037; font-weight:800; display:flex; justify-content:space-between; align-items:center;">
                     <span style="display:flex; align-items:center; gap: 8px;">
                         <span class="ai-alert-pulse-dot"></span>
-                        🧠 Розумні AI-підказки Керівнику:
+                        🧠 Розумні ШІ-підказки Керівнику:
                     </span>
                 </h4>
                 <div id="ai-alerts-container">
-                    <div class="ai-alert-item">💡 Розрахуйте плани або внесіть факти...</div>
+                    <div class="ai-alert-item">💡 Розрахуйте плани або внесіть фактичні дані...</div>
                 </div>
             </div>
 
@@ -941,12 +1313,12 @@
                     <table>
                         <thead><tr><th>Категорія</th><th>ПІБ Лідера</th><th>Фото</th></tr></thead>
                         <tbody>
-                            <tr><td>Місяць: Загальні</td><td><input type="text" id="inp-name-m-gen"></td><td><label class="file-input-label">Обрати photo<input type="file" onchange="uploadLeaderPhoto(this, 'mGen')"></label></td></tr>
-                            <tr><td>Місяць: Happy</td><td><input type="text" id="inp-name-m-happy"></td><td><label class="file-input-label">Обрати photo<input type="file" onchange="uploadLeaderPhoto(this, 'mHappy')"></label></td></tr>
-                            <tr><td>Місяць: Встановл.</td><td><input type="text" id="inp-name-m-install"></td><td><label class="file-input-label">Обрати photo<input type="file" onchange="uploadLeaderPhoto(this, 'mInstall')"></label></td></tr>
-                            <tr><td>День: Загальні</td><td><input type="text" id="inp-name-d-gen"></td><td><label class="file-input-label">Обрати photo<input type="file" onchange="uploadLeaderPhoto(this, 'dGen')"></label></td></tr>
-                            <tr><td>День: Happy</td><td><input type="text" id="inp-name-d-happy"></td><td><label class="file-input-label">Обрати photo<input type="file" onchange="uploadLeaderPhoto(this, 'dHappy')"></label></td></tr>
-                            <tr><td>День: Встановл.</td><td><input type="text" id="inp-name-d-install"></td><td><label class="file-input-label">Обрати photo<input type="file" onchange="uploadLeaderPhoto(this, 'dInstall')"></label></td></tr>
+                            <tr><td>Місяць: Загальні</td><td><input type="text" id="inp-name-m-gen"></td><td><label class="file-input-label">Обрати фото<input type="file" onchange="uploadLeaderPhoto(this, 'mGen')"></label></td></tr>
+                            <tr><td>Місяць: Happy</td><td><input type="text" id="inp-name-m-happy"></td><td><label class="file-input-label">Обрати фото<input type="file" onchange="uploadLeaderPhoto(this, 'mHappy')"></label></td></tr>
+                            <tr><td>Місяць: Встанов.</td><td><input type="text" id="inp-name-m-install"></td><td><label class="file-input-label">Обрати фото<input type="file" onchange="uploadLeaderPhoto(this, 'mInstall')"></label></td></tr>
+                            <tr><td>День: Загальні</td><td><input type="text" id="inp-name-d-gen"></td><td><label class="file-input-label">Обрати фото<input type="file" onchange="uploadLeaderPhoto(this, 'dGen')"></label></td></tr>
+                            <tr><td>День: Happy</td><td><input type="text" id="inp-name-d-happy"></td><td><label class="file-input-label">Обрати фото<input type="file" onchange="uploadLeaderPhoto(this, 'dHappy')"></label></td></tr>
+                            <tr><td>День: Встанов.</td><td><input type="text" id="inp-name-d-install"></td><td><label class="file-input-label">Обрати photo<input type="file" onchange="uploadLeaderPhoto(this, 'dInstall')"></label></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -967,10 +1339,10 @@
             </div>
         </div>
 
-        <!-- FORMAT SECTION -->
+        <!-- РОЗДІЛ "ФОРМАТ" -->
         <div id="format" class="section">
             <h2>🏢 Формат: Операційне управління зонами</h2>
-            <p style="color:var(--comfy-muted); margin-bottom:20px; font-weight:500; font-size:14px; line-height: 1.5;">Контроль викладки, цінників та прибирання. Авто-таски призначаються за поточним днем тижня.</p>
+            <p style="color:var(--comfy-muted); margin-bottom:20px; font-weight:500; font-size:14px; line-height: 1.5;">Контроль викладки, цінників та прибирання. Авто-завдання призначаються відповідно до поточного дня тижня.</p>
             
             <div class="table-container">
                 <table id="format-main-table">
@@ -978,13 +1350,13 @@
                         <tr>
                             <th>Товарна Зона</th>
                             <th>Відповідальний</th>
-                            <th>Задача на сьогодні (Адмін)</th>
+                            <th>Завдання на сьогодні</th>
                             <th style="width:220px;">Статус виконання</th>
                             <th class="admin-only" style="width:80px;">Дія</th>
                         </tr>
                     </thead>
                     <tbody id="zones-table-body">
-                        <!-- Dynamic content -->
+                        <!-- Динамическое наполнение -->
                     </tbody>
                 </table>
             </div>
@@ -994,7 +1366,7 @@
                 <button class="btn admin-only" onclick="addNewZoneRow()" style="background:#3b82f6; color:white; flex: 1;">➕ Додати зону</button>
             </div>
 
-            <!-- CHECKLIST WIDGET -->
+            <!-- ВІДЖЕТ ЧЕК-ЛИСТІВ -->
             <div class="checklist-container">
                 <h3 style="margin: 0 0 10px 0;">📋 Операційні чек-листи зміни (Відкриття / Закриття)</h3>
                 <div class="checklist-tabs">
@@ -1002,7 +1374,7 @@
                     <button id="chk-tab-close" class="checklist-tab-btn" onclick="switchChecklistTab('close')">🌌 Закриття зміни</button>
                 </div>
                 <div id="checklist-items-box">
-                    <!-- Dynamic checklist items -->
+                    <!-- Динамические чек-листы -->
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
                     <span id="checklist-counter" style="font-size:13px; font-weight:800; color:var(--comfy-muted);">Виконано: 0%</span>
@@ -1013,9 +1385,9 @@
                 </div>
             </div>
 
-            <!-- WEEKDAY MATRIX FOR ADMIN -->
+            <!-- МАТРИЦЯ НА ДЕНЬ ДЛЯ АДМІНІСТРАТОРА -->
             <div class="admin-only" style="background:rgba(248,250,252,0.02); padding:20px; border-radius:16px; border:1px dashed var(--comfy-border); margin-top: 30px;">
-                <h3>⚙️ Редактор базових операційних завдань за днями</h3>
+                <h3>⚙️ Редактор базових операційних завдань по днях</h3>
                 <div class="grid-2">
                     <div class="form-group"><label>Понеділок:</label><input type="text" id="dt-1"></div>
                     <div class="form-group"><label>Вівторок:</label><input type="text" id="dt-2"></div>
@@ -1033,134 +1405,224 @@
             </div>
         </div>
 
-        <!-- SERVICES SECTION -->
+        <!-- РАЗДЕЛ "НАШІ СЕРВІСИ" -->
         <div id="our-services" class="section">
-            <h2>💼 Каталог внутрішніх сервісів & Продажі</h2>
-            <div class="service-grid" id="services-container"></div>
-            <br>
-            <button class="btn btn-success admin-only" onclick="saveServicesData()">💾 Зберегти зміни сервісів</button>
+            <h2>💼 Наші сервіси</h2>
+            <p style="color:var(--comfy-muted); margin-bottom:15px; font-weight:500; font-size:14px; line-height: 1.5;">Проведіть пальцем вліво або вправо на смартфоні для перегляду карток. <strong>У режимі Керівника</strong> ви можете натискати та вільно редагувати назви сервісів, ціни та описи прямо в картках.</p>
+            
+            <div class="carousel-wrapper">
+                <div class="carousel-container" id="services-container">
+                    <!-- Динамические полупрозрачные карточки -->
+                </div>
+            </div>
+            
+            <div class="admin-only mt-4">
+                <button class="btn btn-success" onclick="saveServicesData()">💾 Зберегти зміни сервісів</button>
+            </div>
         </div>
 
-        <!-- STAFF PLANS SECTION -->
+        <!-- РАЗДЕЛ "ПЕРСОНАЛЬНІ ПЛАНИ" -->
         <div id="plans" class="section">
-            <h2>👤 Персональні плани та налаштування штату</h2>
+            <h2>👤 Персональні плани та коефіцієнти штату</h2>
             <div class="table-container">
                 <table>
-                    <thead><tr><th>Ім'я</th><th>Статус</th><th>Вага</th><th>Факт (грн)</th><th>Поточний План (грн)</th><th class="admin-only">Дія</th></tr></thead>
+                    <thead><tr><th>Ім'я</th><th>Статус</th><th>Вага (коеф)</th><th>Факт (грн)</th><th>Поточний План (грн)</th><th class="admin-only">Дія</th></tr></thead>
                     <tbody id="staff-editor-table"></tbody>
                 </table>
             </div>
             <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                <button class="btn btn-success admin-only" onclick="saveStaffEditor()" style="flex: 1;">💾 Зберегти зміни працівників</button>
-                <button class="btn admin-only" onclick="addNewSeller()" style="background:#3b82f6; color:white; flex: 1;">➕ Додати працівника</button>
+                <button class="btn btn-success admin-only" onclick="saveStaffEditor()" style="flex: 1;">💾 Зберегти зміни співробітників</button>
+                <button class="btn admin-only" onclick="addNewSeller()" style="background:#3b82f6; color:white; flex: 1;">➕ Додати співробітника</button>
             </div>
         </div>
 
-        <!-- AUTO DISTRIBUTION SECTION -->
+        <!-- РАЗДЕЛ "АВТОРОЗПОДІЛ" -->
         <div id="auto-dist" class="section">
             <h2>🤖 Автоматичний розподіл загального плану</h2>
             <div class="form-group" style="max-width: 450px;">
-                <label for="total-target">Загальний сервісний план магазина (грн):</label>
+                <label for="total-target">Загальний сервісний план магазину (грн):</label>
                 <input type="number" id="total-target" value="150000">
             </div>
-            <button class="btn btn-success" onclick="runAutoDistribution()">⚡ Розподілити на команду за коефіцієнтами</button>
+            <button class="btn btn-success" onclick="runAutoDistribution()">⚡ Розподілити на команду відповідно до ваги</button>
         </div>
 
-        <!-- SHARE RATING SECTION -->
+        <!-- РАЗДЕЛ "РЕЙТИНГ ТА ЧАСТКИ" -->
         <div id="share" class="section">
             <h2>📈 Рейтинг продавців за % виконання плану та фінансові частки</h2>
             <div class="table-container">
                 <table>
-                    <thead><tr><th>Місце</th><th>Працівник</th><th>Посада</th><th>План (грн)</th><th>Факт (грн)</th><th>% Виконання</th><th>Частка від всього магазину (%)</th></tr></thead>
+                    <thead><tr><th>Місце</th><th>Співробітник</th><th>Посада</th><th>План (грн)</th><th>Факт (грн)</th><th>% Виконання</th><th>Частка від усього магазину (%)</th></tr></thead>
                     <tbody id="share-table-body"></tbody>
                 </table>
             </div>
         </div>
 
-        <!-- TRAINING SECTION (COMPETENCY SKILLS MATRIX) -->
-        <div id="training" class="section">
-            <h2>🎓 Навчання: Матриця Кваліфікації та Навичок</h2>
-            <p style="color:var(--comfy-muted); font-size:13px; margin-bottom:15px; font-weight:500;">
-                Контролюйте рівень кваліфікації торгового персоналу. Перемикайте зірковий рівень у кожного продавця.
+        <!-- ОБ'ЄДНАНИЙ РАЗДЕЛ "КОМАНДА ТА РОЗВИТОК" -->
+        <div id="team-hub" class="section">
+            <h2>👥 Команда та Розвиток: Графік, Навчання, Індивідуальні картки</h2>
+            <p style="color:var(--comfy-muted); font-size:13px; margin-bottom:20px; font-weight:500;">
+                Єдиний хаб управління персоналом. Переглядайте матрицю кваліфікації, керуйте графіком змін та натискайте на картку будь-якого продавця для перегляду його історії завдань, зустрічей 1-on-1 та термінів виконання.
             </p>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Працівник</th>
-                            <th>Скрипт продажів</th>
-                            <th>Happy сервіс (Страхування)</th>
-                            <th>Налаштування IT</th>
-                            <th>Встановлення КБТ</th>
-                        </tr>
-                    </thead>
-                    <tbody id="skills-matrix-tbody">
-                        <!-- Dynamically Generated Matrix -->
-                    </tbody>
-                </table>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <!-- ГРАФІК ЗМІН -->
+                <div class="bg-slate-50 dark:bg-zinc-800/40 p-4 rounded-2xl border border-slate-100 dark:border-zinc-700/60 shadow-sm">
+                    <h3 class="mt-0 text-md font-bold mb-3">🗓️ Графік робочих змін торгової команди</h3>
+                    <p class="text-xs text-slate-400 dark:text-zinc-500 mb-3">Натискайте статус для перемикання (🟢 Робота / ⚪ Вихідний)</p>
+                    <div class="table-container">
+                        <table class="min-w-full text-xs">
+                            <thead>
+                                <tr>
+                                    <th>Продавець</th>
+                                    <th style="text-align:center; width:50px;">Пн</th>
+                                    <th style="text-align:center; width:50px;">Вт</th>
+                                    <th style="text-align:center; width:50px;">Ср</th>
+                                    <th style="text-align:center; width:50px;">Чт</th>
+                                    <th style="text-align:center; width:50px;">Пт</th>
+                                    <th style="text-align:center; width:50px;">Сб</th>
+                                    <th style="text-align:center; width:50px;">Нд</th>
+                                </tr>
+                            </thead>
+                            <tbody id="shifts-planner-tbody"></tbody>
+                        </table>
+                    </div>
+                    <button class="btn btn-success text-xs mt-2 w-full py-2" onclick="saveShiftsData()">💾 Зберегти графік змін</button>
+                </div>
+
+                <!-- МАТРИЦЯ КВАЛІФІКАЦІЇ -->
+                <div class="bg-slate-50 dark:bg-zinc-800/40 p-4 rounded-2xl border border-slate-100 dark:border-zinc-700/60 shadow-sm">
+                    <h3 class="mt-0 text-md font-bold mb-3">🎓 Матриця кваліфікації та навичок</h3>
+                    <p class="text-xs text-slate-400 dark:text-zinc-500 mb-3">Зоряний рейтинг компетенцій (1-4 зірки)</p>
+                    <div class="table-container">
+                        <table class="min-w-full text-xs">
+                            <thead>
+                                <tr>
+                                    <th>Продавець</th>
+                                    <th>Скрипт</th>
+                                    <th>Happy</th>
+                                    <th>IT Софт</th>
+                                    <th>КБТ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="skills-matrix-tbody"></tbody>
+                        </table>
+                    </div>
+                    <button class="btn btn-success text-xs mt-2 w-full py-2 admin-only" onclick="saveTrainingData()">💾 Зберегти матрицю навичок</button>
+                </div>
             </div>
-            <button class="btn btn-success admin-only" onclick="saveTrainingData()">💾 Зберегти матрицю кваліфікації</button>
+
+            <!-- ІНТЕРАКТИВНІ КАРТКИ ПРОДАВЦІВ -->
+            <h3 class="mb-4">📇 Оберіть продавця для детального розвитку та завдань:</h3>
+            <div id="team-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <!-- Картки генеруються за допомогою JS -->
+            </div>
+
+            <!-- ДЕТАЛЬНИЙ БЛОК ПРОДАВЦЯ (З'ЯВЛЯЄТЬСЯ ПРИ НАТИСКАННІ) -->
+            <div id="member-detail-panel" class="hidden bg-slate-50 dark:bg-zinc-800/60 border border-slate-100 dark:border-zinc-700 p-6 rounded-3xl shadow-lg transition-all duration-300">
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-comfyGreen">
+                            <img id="detail-member-photo" src="" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <h4 id="detail-member-name" class="text-xl font-black text-slate-800 dark:text-white">Продавець</h4>
+                            <span id="detail-member-badge" class="text-xs px-2 py-0.5 rounded-md font-bold text-white uppercase bg-comfyOrange">PRO</span>
+                        </div>
+                    </div>
+                    <button class="text-slate-400 hover:text-slate-600 dark:hover:text-white text-lg font-bold" onclick="closeDetailPanel()">✕</button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Завдання продавця -->
+                    <div>
+                        <h4 class="font-bold text-sm text-slate-500 dark:text-zinc-400 mb-2">📋 Призначені завдання та цілі</h4>
+                        <div class="table-container max-h-60 overflow-y-auto mb-2">
+                            <table class="w-full text-xs">
+                                <thead>
+                                    <tr>
+                                        <th>Завдання</th>
+                                        <th>Термін</th>
+                                        <th>Статус</th>
+                                        <th class="admin-only">Дія</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="detail-tasks-tbody"></tbody>
+                            </table>
+                        </div>
+                        <div class="admin-only bg-white dark:bg-zinc-850 p-3 rounded-xl border border-slate-100 dark:border-zinc-700 mt-2">
+                            <p class="text-xs font-bold mb-2">➕ Створити завдання співробітнику:</p>
+                            <div class="flex flex-col gap-2">
+                                <input type="text" id="new-member-task-text" placeholder="Суть завдання" class="text-xs p-1">
+                                <input type="text" id="new-member-task-deadline" placeholder="Термін (напр. до 15.06)" class="text-xs p-1">
+                                <button class="btn btn-success py-1 min-h-[30px] text-xs" onclick="addMemberTask()">Додати</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ОСОБИСТІ ЗУСТРІЧІ (One-to-One) -->
+                    <div>
+                        <h4 class="font-bold text-sm text-slate-500 dark:text-zinc-400 mb-2">🤝 Календар зустрічей One-to-One</h4>
+                        <div class="table-container max-h-60 overflow-y-auto mb-2">
+                            <table class="w-full text-xs">
+                                <thead>
+                                    <tr>
+                                        <th>Дата / Час</th>
+                                        <th>Тема зустрічі / Результат</th>
+                                        <th class="admin-only">Дія</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="detail-meetings-tbody"></tbody>
+                            </table>
+                        </div>
+                        <div class="admin-only bg-white dark:bg-zinc-850 p-3 rounded-xl border border-slate-100 dark:border-zinc-700 mt-2">
+                            <p class="text-xs font-bold mb-2">➕ Запланувати зустріч 1-on-1:</p>
+                            <div class="flex flex-col gap-2">
+                                <input type="text" id="new-member-meet-date" placeholder="Дата та час (напр. Пт, 14:00)" class="text-xs p-1">
+                                <input type="text" id="new-member-meet-topic" placeholder="Тема або мета зустрічі" class="text-xs p-1">
+                                <button class="btn btn-success py-1 min-h-[30px] text-xs" onclick="addMemberMeeting()">Створити зустріч</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- CALENDAR SECTION (SHIFT SCHEDULE & OPERATION TASKS) -->
-        <div id="calendar" class="section">
-            <h2>📅 Operational Calendar & Графік робочих змін</h2>
-            
-            <!-- WEEKLY SHIFT PLANNER BOARD -->
-            <h3 style="margin-bottom:12px;">🗓️ Робочий графік змін торгової команди (на тиждень)</h3>
-            <p style="color:var(--comfy-muted); font-size:13px; margin-bottom:15px; font-weight:500;">
-                Клікніть на статус, щоб перемкнути: 🟢 Робота чи ⚪ Вихідний. Дані автоматично інтегруються у щоденні розрахунки зміни!
-            </p>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Працівник</th>
-                            <th style="text-align:center; width:90px;">Пн</th>
-                            <th style="text-align:center; width:90px;">Вт</th>
-                            <th style="text-align:center; width:90px;">Ср</th>
-                            <th style="text-align:center; width:90px;">Чт</th>
-                            <th style="text-align:center; width:90px;">Пт</th>
-                            <th style="text-align:center; width:90px;">Сб</th>
-                            <th style="text-align:center; width:90px;">Нд</th>
-                        </tr>
-                    </thead>
-                    <tbody id="shifts-planner-tbody">
-                        <!-- Dynamically populated shifts planner rows -->
-                    </tbody>
-                </table>
-            </div>
-            <div style="display:flex; justify-content:flex-end; margin-bottom:30px;">
-                <button class="btn btn-success" onclick="saveShiftsData()">💾 Зберегти графік змін торгової команди</button>
-            </div>
-
-            <h3>📝 Загальномагазинні сервісні задачі</h3>
-            <div class="table-container">
-                <table>
-                    <thead><tr><th>Термін</th><th>Зміст завдання</th><th>Відповідальний</th><th class="admin-only">Дія</th></tr></thead>
-                    <tbody id="calendar-table-body"></tbody>
-                </table>
-            </div>
-            <button class="btn admin-only" onclick="addNewTaskRow()" style="background:#e2e8f0; color:var(--comfy-dark)">➕ Додати задачу</button>
-
-            <h3 style="margin-top:35px;">🗓️ Особисті зустрічі з продавцями (One-to-One)</h3>
-            <div class="table-container">
-                <table>
-                    <thead><tr><th>Дата / Час</th><th>Працівник</th><th>Ціль зустрічі / Результат</th><th class="admin-only">Дія</th></tr></thead>
-                    <tbody id="meetings-table-body"></tbody>
-                </table>
-            </div>
-            <button class="btn admin-only" onclick="addNewMeetingRow()" style="background:#e2e8f0; color:var(--comfy-dark)">➕ Додати зустріч</button>
-            <br><br>
-            <button class="btn btn-success admin-only" onclick="saveCalendarAndMeetings()">💾 Зберегти календар та зустрічі</button>
-        </div>
-
-        <!-- STRATEGY SECTION -->
+        <!-- РАЗДЕЛ "СТРАТЕГІЯ" -->
         <div id="strategy" class="section">
             <h2>🛡️ Захист сервісної стратегії на місяць</h2>
+            
             <div style="display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap;">
                 <button class="btn btn-success" onclick="exportReportToClipboard('telegram')" style="background:#0088cc; color: white; border: none; flex: 1;">✈️ Скопіювати для Telegram</button>
                 <button class="btn btn-success" onclick="exportReportToClipboard('viber')" style="background:#7360f2; color: white; border: none; flex: 1;">📱 Скопіювати для Viber</button>
+                <!-- Кнопка генератора Glassmorphic отчета-презентации -->
+                <button class="btn btn-success" onclick="openStrategyPresentation()" style="background:linear-gradient(135deg, #6366f1, #4f46e5); color: white; border: none; flex: 1;">📊 Сгенерувати звіт-презентацію</button>
+            </div>
+
+            <!-- GEMINI AI ИНТЕГРАЦИЯ -->
+            <div class="bg-gradient-to-br from-indigo-950 via-slate-900 to-zinc-950 p-6 rounded-3xl border border-indigo-500/30 shadow-2xl mb-8 text-white">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="text-2xl">🤖</span>
+                    <div>
+                        <h4 class="font-extrabold text-lg text-indigo-300">ШІ-Помічник Gemini Assistant</h4>
+                        <p class="text-xs text-slate-400">Розумний аналіз показників вашого магазину в реальному часі</p>
+                    </div>
+                </div>
+                
+                <!-- Chatbox history -->
+                <div id="gemini-chat-history" class="bg-black/40 border border-slate-800/80 rounded-2xl p-4 h-64 overflow-y-auto mb-4 text-xs flex flex-col gap-3">
+                    <div class="text-slate-400 italic">Привіт, шеф! Я готовий проаналізувати поточні плани, результати продавців, матрицю навичок та графік магазину. Скористайтеся підказками нижче або запитайте мене напряму.</div>
+                </div>
+
+                <div class="flex gap-2 flex-wrap mb-4">
+                    <button class="bg-indigo-600/30 hover:bg-indigo-600/60 text-indigo-200 border border-indigo-500/30 text-xs px-3 py-1.5 rounded-xl transition-all" onclick="askGeminiPrompt('KPI-анализ')">📊 Запустити повний KPI-аналіз команди</button>
+                    <button class="bg-emerald-600/30 hover:bg-emerald-600/60 text-emerald-200 border border-emerald-500/30 text-xs px-3 py-1.5 rounded-xl transition-all" onclick="askGeminiPrompt('Слабые зоны')">⚠️ Скласти план дій для відстаючих</button>
+                    <button class="bg-amber-600/30 hover:bg-amber-600/60 text-amber-200 border border-amber-500/30 text-xs px-3 py-1.5 rounded-xl transition-all" onclick="askGeminiPrompt('Идеи продаж')">💡 Порадь методи підняття продажів страхування</button>
+                </div>
+
+                <div class="flex gap-2">
+                    <input type="text" id="gemini-user-input" placeholder="Запитати у Gemini (наприклад: Створи план мотивації для Олександра)..." class="bg-slate-900/90 text-white border-slate-700/80 text-xs focus:ring-1 focus:ring-indigo-500 rounded-xl flex-1 px-3 py-2">
+                    <button id="gemini-send-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-4 py-2 rounded-xl transition-all" onclick="sendCustomGeminiQuery()">Надіслати</button>
+                </div>
             </div>
 
             <div style="background: var(--comfy-card-bg); padding: 20px; border-radius: 20px; border: 2px solid var(--comfy-border); margin: 20px 0;">
@@ -1184,7 +1646,7 @@
             </div>
 
             <div class="grid-2">
-                <div class="form-group"><label>Результат твого магазину минулого місяця (грн):</label><input type="number" id="strat-input-shop" value="136000"></div>
+                <div class="form-group"><label>Результат твого магазину в минулому місяці (грн):</label><input type="number" id="strat-input-shop" value="136000"></div>
                 <div class="form-group"><label>Середній результат Регіону (грн):</label><input type="number" id="strat-input-region" value="140000"></div>
             </div>
             <div class="grid-2">
@@ -1192,7 +1654,7 @@
                 <div class="form-group"><label>Результат магазину 3 місяці тому (грн):</label><input type="number" id="strat-shop-history-3" value="118000"></div>
             </div>
 
-            <h3>👥 Історія продажів кожного продавця</h3>
+            <h3>👥 Історія продажів кожного продавця за попередні періоди</h3>
             <div class="table-container">
                 <table>
                     <thead><tr><th>Ім'я</th><th>2 місяці тому (грн)</th><th>3 місяці тому (грн)</th></tr></thead>
@@ -1200,33 +1662,33 @@
                 </table>
             </div>
             
-            <button class="btn btn-success admin-only" onclick="triggerAISteps()" style="width:100%; margin-bottom:15px;">🧠 Розрахувати рішення на основі результатів & кваліфікації</button>
+            <button class="btn btn-success admin-only" onclick="triggerAISteps()" style="width:100%; margin-bottom:15px;">🧠 Розрахувати рішення на основі результатів та кваліфікації</button>
             
-            <!-- STYLISH AI LOADING SCAN SHIMMER -->
+            <!-- ШИММЕР ЗАГРУЗКИ АНАЛИЗА ИИ -->
             <div class="ai-shimmer-container">
                 <div class="ai-shimmer-overlay" id="ai-scanning-screen">
                     <div class="ai-radar-line"></div>
                     <div class="ai-loader-spinner"></div>
-                    <p style="font-weight:800; color:var(--comfy-green); font-size:16px;">AI Аналізує результати та кваліфікацію...</p>
+                    <p style="font-weight:800; color:var(--comfy-green); font-size:16px;">ШІ аналізує результати та кваліфікацію...</p>
                 </div>
 
                 <div class="form-group"><label>🎯 Стратегія по магазину (Генерується автоматично на базі KPI):</label><textarea id="strat-goals" rows="3"></textarea></div>
-                <div class="form-group"><label>👥 Індивідуальні плани дій по слабких результатах (AI-Аналізатор):</label><textarea id="strat-low-performers" rows="8"></textarea></div>
-                <div class="form-group"><label>🛠️ Аналіз попередніх успішних дій:</label><textarea id="strat-done" rows="3"></textarea></div>
+                <div class="form-group"><label>👥 Індивідуальні плани дій щодо слабких результатів (AI-Аналізатор):</label><textarea id="strat-low-performers" rows="8"></textarea></div>
+                <div class="form-group"><label>🛠️ :</label><textarea id="strat-done" rows="3"></textarea></div>
             </div>
             
             <button class="btn btn-success admin-only" onclick="saveStrategy()">💾 Зберегти фінальну стратегію</button>
         </div>
 
-        <!-- ACTION NOW SECTION -->
+        <!-- РАЗДЕЛ "КОНСТРУКТОР ДНЯ" -->
         <div id="action-now" class="section">
             <h2>⚡ Розумний конструктор денного плану</h2>
-            <p style="color:var(--comfy-muted); margin-bottom:20px; font-weight:500; font-size: 14px; line-height: 1.5;">Вкажіть загальний план на день — система миттєво розподілить персональні задачі на поточну зміну.</p>
+            <p style="color:var(--comfy-muted); margin-bottom:20px; font-weight:500; font-size: 14px; line-height: 1.5;">Вкажіть загальний план на день — система миттєво розподілить персональні завдання на поточну зміну.</p>
             
             <div class="grid-2" style="margin-bottom: 20px;">
                 <div class="form-group">
                     <label>Цільовий сервісний фокус дня:</label>
-                    <input type="text" id="tom-focus-input" value="Максимальний фокус на склі/плівках до смартфонів">
+                    <input type="text" id="tom-focus-input" value="Максимальний фокус на склі/плівці до смартфонів">
                 </div>
                 <div class="form-group">
                     <label>Загальний план на зміну (грн):</label>
@@ -1235,20 +1697,20 @@
             </div>
 
             <div style="background:rgba(248, 250, 252, 0.03); border:1px solid var(--comfy-border); border-radius:16px; padding:15px; margin-bottom:25px;">
-                <h4 style="margin-bottom:8px; font-weight:800; color:var(--comfy-dark);">⏱️ Годинний Ранрейт-Навігатор</h4>
+                <h4 style="margin-bottom:8px; font-weight:800; color:var(--comfy-dark);">⏱️ Погодинний Ранрейт-Навігатор</h4>
                 <div class="form-group" style="margin-bottom:0; max-width:300px;">
                     <label for="hours-left-input" style="font-size:12px; font-weight:700; margin-bottom:5px;">Годин залишилося до закриття зміни:</label>
                     <input type="number" id="hours-left-input" value="8" min="1" max="14" oninput="recalculateDailyPlan()" style="min-height:36px; padding:6px 10px;">
                 </div>
             </div>
 
-            <h3>👥 Хто сьогодні на зміні? (Доступно завжди)</h3>
+            <h3>👥 Хто сьогодні на зміні?</h3>
             <div id="daily-attendance-container" style="display:flex; gap:10px; margin-bottom:25px; flex-wrap:wrap;"></div>
 
             <h3>📋 Розподілені персональні цілі на день:</h3>
             <div class="table-container">
                 <table style="margin-bottom:0;">
-                    <thead><tr><th>Співробітник</th><th>Посада / Вага</th><th>Індивідуальний план на зміну</th><th>Необхідний темп за годину</th></tr></thead>
+                    <thead><tr><th>Співробітник</th><th>Посада / Вага</th><th>Індивідуальний план на зміну</th><th>Необхідний темп на годину</th></tr></thead>
                     <tbody id="daily-calculated-tbody"></tbody>
                 </table>
             </div>
@@ -1262,110 +1724,466 @@
 
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
+    <!-- STRATEGY PRESENTATION MODAL (GLASSMORPHIC TEMPLATE FOR PDF) -->
+    <div id="strategy-presentation-modal" style="display:none; opacity:0; transition: opacity 0.25s ease;" class="fixed inset-0 bg-slate-950/85 backdrop-blur-xl z-[9999] overflow-y-auto p-4 md:p-8 justify-center items-center">
+        <div class="relative w-full max-w-5xl bg-slate-900/90 text-white border border-slate-700/60 rounded-3xl shadow-2xl p-6 md:p-10 flex flex-col gap-6 font-sans">
+            <!-- Кнопки управления (не выводятся на печать) -->
+            <div class="flex justify-between items-center border-b border-slate-800 pb-4 no-print">
+                <h3 class="text-md font-bold text-comfyGreen mt-0">📊 Презентація сервісної стратегії магазину</h3>
+                <div class="flex gap-2">
+                    <button class="bg-indigo-600 hover:bg-indigo-500 text-xs text-white font-bold py-2 px-4 rounded-xl transition-all" onclick="window.print()">🖨️ Друкувати в PDF</button>
+                    <button class="bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 font-bold py-2 px-4 rounded-xl transition-all" onclick="closeStrategyPresentation()">✕ Закрити</button>
+                </div>
+            </div>
+
+            <!-- Тело презентации -->
+            <div class="flex flex-col gap-6" id="slide-printable-content">
+                <!-- Шапка слайда -->
+                <div class="flex justify-between items-start border-b-2 border-comfyGreen/40 pb-4">
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-black tracking-tight text-white uppercase">Стратегія розвитку: Сервіси</h1>
+                        <p class="text-xs text-comfyGreen font-bold tracking-wide mt-1 uppercase" id="presentation-date">Червень 2026 • Панель Керівника COMFY</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs bg-comfyGreen text-black font-extrabold px-3 py-1 rounded-full uppercase">COMFY PRO</span>
+                    </div>
+                </div>
+
+                <!-- Сетка содержимого слайда -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Левая колонка: KPI и План -->
+                    <div class="flex flex-col gap-6">
+                        <!-- KPI прошлого месяца -->
+                        <div class="bg-slate-800/50 border border-slate-700/60 rounded-2xl p-5 backdrop-blur">
+                            <h2 class="text-sm font-extrabold text-comfyGreen uppercase tracking-wider mb-3">📈 Розділ 1: Підсумки минулого місяця</h2>
+                            <div class="grid grid-cols-3 gap-3 mb-4 text-center">
+                                <div class="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800">
+                                    <div class="text-[10px] text-slate-400 font-bold uppercase">Магазин</div>
+                                    <div class="text-sm font-black text-white mt-1" id="pres-kpi-shop">0 ₴</div>
+                                </div>
+                                <div class="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800">
+                                    <div class="text-[10px] text-slate-400 font-bold uppercase">Регіон</div>
+                                    <div class="text-sm font-black text-slate-300 mt-1" id="pres-kpi-region">0 ₴</div>
+                                </div>
+                                <div class="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800">
+                                    <div class="text-[10px] text-slate-400 font-bold uppercase">Індекс</div>
+                                    <div class="text-sm font-black text-comfyOrange mt-1" id="pres-kpi-index">100%</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 bg-slate-900/40 p-3 rounded-xl border border-slate-800/80">
+                                <div class="w-10 h-10 rounded-full overflow-hidden border border-comfyGreen">
+                                    <img id="pres-best-photo" src="" class="w-full h-full object-cover">
+                                </div>
+                                <div>
+                                    <div class="text-[10px] text-slate-400 uppercase font-bold">Найкращий співробітник за загальними сервісами</div>
+                                    <div class="text-xs font-black text-white" id="pres-best-name">-</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Цели и инструменты -->
+                        <div class="bg-slate-800/50 border border-slate-700/60 rounded-2xl p-5 backdrop-blur flex-1">
+                            <h2 class="text-sm font-extrabold text-comfyGreen uppercase tracking-wider mb-3">🎯 Розділ 2: План на поточний місяць</h2>
+                            <div class="flex flex-col gap-3 text-xs leading-relaxed text-slate-300">
+                                <div>
+                                    <strong class="text-white">Ключові цілі та фокуси:</strong>
+                                    <p class="mt-1 text-slate-400 italic" id="pres-goals-text">-</p>
+                                </div>
+                                <div>
+                                    <strong class="text-white">Основні інструменти реалізації:</strong>
+                                    <ul class="list-disc pl-4 mt-1 text-slate-400 space-y-1">
+                                        <li>Проведення мікронавчань за допомогою Матриці Кваліфікації.</li>
+                                        <li>Контроль щоденного ранрейту за допомогою Конструктора дня.</li>
+                                        <li>Індивідуальні плани розвитку та регулярні зустрічі One-to-One.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Правая колонка: Персонализация -->
+                    <div class="bg-slate-800/50 border border-slate-700/60 rounded-2xl p-5 backdrop-blur flex flex-col justify-between">
+                        <div>
+                            <h2 class="text-sm font-extrabold text-comfyGreen uppercase tracking-wider mb-3">👥 Розділ 3: Персоналізація команди</h2>
+                            <div class="table-container bg-transparent border-0 mb-0 max-h-80 overflow-y-auto">
+                                <table class="min-w-full text-xs text-left">
+                                    <thead>
+                                        <tr class="border-b border-slate-700">
+                                            <th class="py-2 text-slate-400 font-bold uppercase text-[10px]">Співробітник</th>
+                                            <th class="py-2 text-slate-400 font-bold uppercase text-[10px]">Результат</th>
+                                            <th class="py-2 text-slate-400 font-bold uppercase text-[10px]">Завдання на цей місяць</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="pres-staff-table">
+                                        <!-- Наполнение -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="text-[10px] text-slate-500 italic mt-4 text-right border-t border-slate-800 pt-2">
+                            Сформовано автоматично • Система керування Comfy Pro
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
         const adminPassword = "1111";
         let isAdmin = false;
 
-        // Expanded default staff with custom competency ratings and weekly shift records
+        // Расширенный список сотрудников с оценками компетенций и расписанием смен украинской локализации
         const defaultStaff = [
-            { id: 'e1', name: 'Олександр', status: 'pro', weight: 1.5, pastSales: 45000, currentPlan: 30000, topic: 'Стандарти Happy сервісу', score: 'Пройшов', history2: 41000, history3: 39000, photo: 'https://placehold.co/100x100/45c735/ffffff?text=Alex', skills: { script: 4, happy: 4, it: 3, kbt: 3 }, shifts: [true, true, false, true, true, false, false] },
-            { id: 'e2', name: 'Дмитро', status: 'pro', weight: 1.3, pastSales: 16000, currentPlan: 25000, topic: 'Встановлення техніки', score: 'На перездачі', history2: 39500, history3: 41000, photo: 'https://placehold.co/100x100/ff6c00/ffffff?text=Dmitry', skills: { script: 3, happy: 2, it: 4, kbt: 4 }, shifts: [true, false, true, true, false, true, false] },
-            { id: 'e3', name: 'Тетяна', status: 'pro', weight: 1.2, pastSales: 35000, currentPlan: 22000, topic: 'Загальний сервісний скрипт', score: 'Пройшов', history2: 33000, history3: 31000, photo: 'https://placehold.co/100x100/3b82f6/ffffff?text=Tanya', skills: { script: 4, happy: 4, it: 2, kbt: 2 }, shifts: [false, true, true, false, true, true, false] },
-            { id: 'e4', name: 'Андрій', status: 'rookie', weight: 0.8, pastSales: 6000, currentPlan: 18000, topic: 'Робота з запереченнями', score: 'Не вивчав', history2: 12000, history3: 5000, photo: 'https://placehold.co/100x100/1f2226/ffffff?text=Andriy', skills: { script: 2, happy: 1, it: 2, kbt: 3 }, shifts: [true, true, false, false, true, false, true] }
+            { id: 'e1', name: 'Олександр', status: 'pro', weight: 1.5, pastSales: 45000, currentPlan: 30000, topic: 'Стандарти Happy сервісу', score: 'Пройдено', history2: 41000, history3: 39000, photo: 'https://placehold.co/100x100/45c735/ffffff?text=Alex', skills: { script: 4, happy: 4, it: 3, kbt: 3 }, shifts: [true, true, false, true, true, false, false], tasks: [{text: 'Пройти сертифікацію Happy-страхування', deadline: 'до 10.06', done: false}], meetings: [{date: 'Пт, 11:00', topic: 'Обговорення лімітів та підвищення крос-чеку'}] },
+            { id: 'e2', name: 'Дмитро', status: 'pro', weight: 1.3, pastSales: 16000, currentPlan: 25000, topic: 'Встановлення техніки', score: 'На перездачі', history2: 39500, history3: 41000, photo: 'https://placehold.co/100x100/ff6c00/ffffff?text=Dmitry', skills: { script: 3, happy: 2, it: 4, kbt: 4 }, shifts: [true, false, true, true, false, true, false], tasks: [{text: 'Розібрати скрипт усунення заперечень КБТ', deadline: 'до 12.06', done: true}], meetings: [] },
+            { id: 'e3', name: 'Тетяна', status: 'pro', weight: 1.2, pastSales: 35000, currentPlan: 22000, topic: 'Загальний сервісний скрипт', score: 'Пройдено', history2: 33000, history3: 31000, photo: 'https://placehold.co/100x100/3b82f6/ffffff?text=Tanya', skills: { script: 4, happy: 4, it: 2, kbt: 2 }, shifts: [false, true, true, false, true, true, false], tasks: [], meetings: [] },
+            { id: 'e4', name: 'Андрій', status: 'rookie', weight: 0.8, pastSales: 6000, currentPlan: 18000, topic: 'Робота із запереченнями', score: 'Не вивчав', history2: 12000, history3: 5000, photo: 'https://placehold.co/100x100/1f2226/ffffff?text=Andriy', skills: { script: 2, happy: 1, it: 2, kbt: 3 }, shifts: [true, true, false, false, true, false, true], tasks: [{text: 'Вивчити презентацію Smart-налаштувань', deadline: 'до 18.06', done: false}], meetings: [] }
         ];
 
-        // Day Matrix logic
         const currentDayIndex = new Date().getDay(); 
         const defaultDayTasks = {
-            1: "Понеділок: Повний аудит та заміна ЦІННИКІВ у зоні відповідно до нових промо.",
+            1: "Понеділок: Повний аудит та заміна ЦІННИКІВ у зоні згідно з новими промо-акціями.",
             2: "Вівторок: Перевірка ПРАВИЛЬНОСТІ ВИКЛАДКИ, оновлення демо-зон.",
-            3: "Середа: Глибоке ПРИБИРАННЯ зони, чистка техніки від пилу.",
-            4: "Четвер: Перевірка наявності інформационных буклетів та ТТХ товарів.",
+            3: "Середа: Глибоке ПРИБИРАННЯ зони, очищення техніки від пилу.",
+            4: "Четвер: Перевірка наявності інформаційних буклетів та ТТХ товарів.",
             5: "П'ятниця: Контроль цінників перед вихідними днями (Суперціни).",
-            6: "Субота: Оперативний мерчандайзинг, гаряче поповнення полиць.",
-            0: "Неділя: Финальний чек-ап цінників, підготовка звітів змін."
+            6: "Суббота: Оперативний мерчандайзинг, гаряче поповнення полиць.",
+            0: "Неділя: Фінальний чек-ап цінників, підготовка звітів змін."
         };
-        let dayTasks = JSON.parse(localStorage.getItem('v10_matrix')) || defaultDayTasks;
-        const todayTaskText = dayTasks[currentDayIndex] || "Спеціальне операційне завдання";
+        const todayTaskText = defaultDayTasks[currentDayIndex] || "Спеціальна операційна задача";
 
-        let defaultZones = [
+        const defaultZones = [
             { zone: '📱 Смартфони та Геймінг', responsible: 'e1', task: todayTaskText, status: 'В процесі' },
             { zone: '💻 Ноутбуки та Аксесуари', responsible: 'e2', task: todayTaskText, status: 'В процесі' },
-            { zone: '📺 Зона ТБ (Телевізори)', responsible: 'e3', task: todayTaskText, status: 'Виконано' },
-            { zone: '🧺 Велика побутова (КБТ)', responsible: 'e4', task: todayTaskText, status: 'В процесі' },
-            { zone: '☕ Дрібна побутова (МБТ)', responsible: 'e1', task: todayTaskText, status: 'Перевірено' }
+            { zone: '📺 Зона ТВ (Телевізори)', responsible: 'e3', task: todayTaskText, status: 'Виконано' },
+            { zone: '🧺 Велика побутова техніка (ВБТ)', responsible: 'e4', task: todayTaskText, status: 'В процесі' },
+            { zone: '☕ Дрібна побутова техніка (ДБТ)', responsible: 'e1', task: todayTaskText, status: 'Перевірено' }
         ];
 
-        // Loading and recovery logic from localStorage
-        let staff = JSON.parse(localStorage.getItem('v10_staff')) || defaultStaff;
-        let zones = JSON.parse(localStorage.getItem('v10_zones')) || defaultZones;
-        let leaders = JSON.parse(localStorage.getItem('v10_leaders')) || { mGen: 'Олександр', mHappy: 'Дмитро', mInstall: 'Тетяна', dGen: 'Олександр', dHappy: 'Дмитро', dInstall: 'Андрій' };
-        
-        let services = JSON.parse(localStorage.getItem('v10_services')) || [
-            { title: '📱 Сервіси до смартфонів', desc: '• Гідрогель, Налаштування акаунтів, Преміум Захист.' },
-            { title: '💻 Сервіси до ноутбуків та ПК', desc: '• Налаштування Windows, Office, Чистка та термопаста.' },
-            { title: '📺 Сервіси до телевізовів', desc: '• Перевірка на пікселі, Калібрування, Smart TV налаштування.' }
+        const defaultCarouselServices = [
+            {
+                category: 'Смартфони',
+                icon: '📱',
+                items: [
+                    { name: 'Поклейка захисного скла', price: '399 ₴', work: 'Очищення дисплея, центрування та безпилове нанесення за 5 хвилин.' },
+                    { name: 'Повний перенос даних', price: '499 ₴', work: 'Швидкий переніс фото, контактів, чатів Viber/Telegram на новий пристрій.' },
+                    { name: 'Налаштування акаунтів (Google/iCloud)', price: '199 ₴', work: 'Створення облікового запису, безпечне збереження паролів та активація хмари.' }
+                ]
+            },
+            {
+                category: 'Ноутбуки',
+                icon: '💻',
+                items: [
+                    { name: 'Встановлення ПЗ та ОС', price: '899 ₴', work: 'Чисте встановлення Windows, драйверів, антивірусу та базового пакету програм.' },
+                    { name: 'Профілактика (очищення + паста)', price: '649 ₴', work: 'Повне продування від пилу, змащення кулера та заміна термопасти Arctic MX-4.' },
+                    { name: 'Встановлення пакету Office', price: '499 ₴', work: 'Встановлення офісних програм Word, Excel, PowerPoint та активація профілю.' }
+                ]
+            },
+            {
+                category: 'Планшети',
+                icon: '📟',
+                items: [
+                    { name: 'Батьківський контроль', price: '249 ₴', work: 'Настройка обмежень контенту, лімітів ігрового часу та відстеження геопозиції Family Link.' },
+                    { name: 'Гідрогелева бронеплівка', price: '449 ₴', work: 'Вирізання на плотері під точний розмір екрану та делікатне нанесення.' }
+                ]
+            },
+            {
+                category: 'Телевізори',
+                icon: '📺',
+                items: [
+                    { name: 'Настінне встановлення ТВ', price: '1199 ₴', work: 'Свердління стін за рівнем, надійний монтаж кронштейна, навішування та укладання кабелів.' },
+                    { name: 'Налаштування Smart TV', price: '399 ₴', work: 'Оновлення прошивки, встановлення популярних медіаплатформ (YouTube, Megogo, Sweet.tv).' }
+                ]
+            },
+            {
+                category: 'ВБТ / ДБТ',
+                icon: '🧺',
+                items: [
+                    { name: 'Встановлення пральної машини', price: '999 ₴', work: 'Демонтаж транспортувальних болтів, вирівнювання за рівнем, підключення до комунікацій.' },
+                    { name: 'Перший запуск кавомашини', price: '299 ₴', work: 'Пролив системи, налаштування ступеня помелу кави та визначення жорсткості води.' }
+                ]
+            }
         ];
 
-        let tasks = JSON.parse(localStorage.getItem('v10_tasks')) || [{ date: 'Щоденно', text: 'Контроль скриптів', ghost: 'Усі' }];
-        let meetings = JSON.parse(localStorage.getItem('v10_meetings')) || [{ date: 'Пт, 11:00', name: 'Андрій', цель: 'Розбір крос-продажів' }];
-        
-        // Checklist logic data
-        let currentChecklistTab = 'open';
         const defaultChecklists = {
             open: [
-                { text: "Ввімкнути ТБ-стенди та виставкові девайси", done: false },
+                { text: "Увімкнути ТВ-стенди та виставкові девайси", done: false },
                 { text: "Аудит цінників та заміна акційних позицій", done: false },
                 { text: "Прибирання пилу та відбитків пальців на вітринах", done: false },
                 { text: "Звірити залишок каси та завантажити стрічку", done: false },
-                { text: "Ввімкнути фонове audio- та відеомовлення", done: false }
+                { text: "Увімкнути фонове аудіо- та відеомовлення", done: false }
             ],
             close: [
-                { text: "Вимкнути ТБ-стенди та підсвітку вітрин", done: false },
+                { text: "Вимкнути ТВ-стенди та підсвічування вітрин", done: false },
                 { text: "Роздрукувати та звірити денні Z-звіти", done: false },
-                { text: "Інкасувати готівку, замкнути сейф", done: false },
-                { text: "Прибрати касовий вузол та спакувати брак/повернення", done: false },
+                { text: "Інкасувати готівку, закрити сейф", done: false },
+                { text: "Прибрати касову зону та запакувати брак/повернення", done: false },
                 { text: "Увімкнути сигналізацію та закрити ролети", done: false }
             ]
         };
-        let checklists = JSON.parse(localStorage.getItem('v10_checklists')) || defaultChecklists;
 
-        // Convert JS Day Index (0-Sun, 1-Mon... 6-Sat) to Comfy Shift Matrix indices (0-Mon, 1-Tue... 6-Sun)
+        // Локальное кэширование
+        let staff = JSON.parse(localStorage.getItem('v10_staff')) || defaultStaff;
+        let zones = JSON.parse(localStorage.getItem('v10_zones')) || defaultZones;
+        let leaders = JSON.parse(localStorage.getItem('v10_leaders')) || { mGen: 'Олександр', mHappy: 'Дмитро', mInstall: 'Тетяна', dGen: 'Олександр', dHappy: 'Дмитро', dInstall: 'Андрій' };
+        let servicesCarousel = JSON.parse(localStorage.getItem('v10_services_carousel')) || defaultCarouselServices;
+        let dayTasks = JSON.parse(localStorage.getItem('v10_matrix')) || defaultDayTasks;
+        let checklists = JSON.parse(localStorage.getItem('v10_checklists')) || defaultChecklists;
+        let data2025 = JSON.parse(localStorage.getItem('v10_data2025')) || [110000, 115000, 120000, 118000, 125000, 130000, 128000, 135000, 132000, 138000, 145000, 175000];
+        let data2026 = JSON.parse(localStorage.getItem('v10_data2026')) || [125000, 128000, 136000, 134000, 142000, 0, 0, 0, 0, 0, 0, 0];
+
+        let currentChecklistTab = 'open';
         const shiftPlannerDayMapping = { 1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 0: 6 };
         const currentShiftPlannerIdx = shiftPlannerDayMapping[currentDayIndex];
 
-        // Set active daily sellers automatically on launch based on today's scheduled shift
+        let selectedMemberId = null;
+
         let activeDailySellers = [];
         staff.forEach(e => {
             if (e.shifts && e.shifts[currentShiftPlannerIdx]) {
                 activeDailySellers.push(e.id);
             }
         });
-        // Fallback to everyone if shift schedule is empty
         if(activeDailySellers.length === 0) {
             activeDailySellers = staff.map(e => e.id);
         }
 
-        const monthsLabels = ['Січ', 'Лют', 'Бер', 'Квіт', 'Трав', 'Черв', 'Лип', 'Серп', 'Верес', 'Жовт', 'Лист', 'Груд'];
-        let data2025 = [110000, 115000, 120000, 118000, 125000, 130000, 128000, 135000, 132000, 138000, 145000, 175000];
-        let data2026 = [125000, 128000, 136000, 134000, 142000, 0, 0, 0, 0, 0, 0, 0];
+        const monthsLabels = ['Січ', 'Лют', 'Бер', 'Кві', 'Тра', 'Чер', 'Лип', 'Сер', 'Вер', 'Жов', 'Лис', 'Гру'];
         let salesChart;
 
-        // Onload init script
+        // Настройки Firebase
+        let isCloudActive = false;
+        let db = null;
+        let auth = null;
+        let appId = typeof __app_id !== 'undefined' ? __app_id : 'comfy-store-sync-system';
+
+        function showToast(message, type = 'success') {
+            const existing = document.getElementById('comfy-toast');
+            if (existing) existing.remove();
+            
+            const toast = document.createElement('div');
+            toast.id = 'comfy-toast';
+            toast.style.position = 'fixed';
+            toast.style.bottom = '24px';
+            toast.style.right = '24px';
+            toast.style.background = type === 'success' ? 'var(--comfy-green)' : (type === 'error' ? 'var(--comfy-danger)' : 'var(--comfy-dark)');
+            toast.style.color = type === 'success' && !document.body.classList.contains('dark-mode') ? '#1f2226' : '#ffffff';
+            toast.style.padding = '14px 24px';
+            toast.style.borderRadius = '12px';
+            toast.style.fontWeight = '800';
+            toast.style.fontSize = '14px';
+            toast.style.boxShadow = '0 10px 25px rgba(0,0,0,0.15)';
+            toast.style.zIndex = '9999';
+            toast.style.display = 'flex';
+            toast.style.alignItems = 'center';
+            toast.style.gap = '10px';
+            toast.style.animation = 'toastIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            
+            let icon = '🔔';
+            if (type === 'success') icon = '✅';
+            if (type === 'error') icon = '❌';
+            
+            toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'toastOut 0.3s forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function showConfirm(title, text, onConfirm) {
+            const modal = document.getElementById('comfy-confirm-modal');
+            const titleEl = document.getElementById('confirm-modal-title');
+            const textEl = document.getElementById('confirm-modal-text');
+            const okBtn = document.getElementById('confirm-ok-btn');
+            const cancelBtn = document.getElementById('confirm-cancel-btn');
+            
+            titleEl.innerText = title;
+            textEl.innerText = text;
+            
+            modal.style.display = 'flex';
+            setTimeout(() => modal.style.opacity = '1', 10);
+            
+            const close = () => {
+                modal.style.opacity = '0';
+                setTimeout(() => modal.style.display = 'none', 200);
+            };
+            
+            okBtn.onclick = () => {
+                onConfirm();
+                close();
+            };
+            cancelBtn.onclick = close;
+            modal.onclick = (e) => {
+                if (e.target === modal) close();
+            };
+        }
+
+        function updateCloudIndicator(status) {
+            const sidebarDot = document.querySelector('#cloud-status-sidebar .cloud-indicator-dot');
+            const sidebarTxt = document.querySelector('#cloud-status-sidebar .cloud-indicator-text');
+
+            let dotColor = '#7f8c99';
+            let label = 'Офлайн режим';
+
+            if (status === 'connecting') {
+                dotColor = '#ffca28';
+                label = 'Підключення...';
+            } else if (status === 'synced') {
+                dotColor = '#45c735';
+                label = 'Облако: Синхронізовано';
+            } else if (status === 'error') {
+                dotColor = '#ff3b30';
+                label = 'Помилка зв\'язку';
+            }
+
+            if(sidebarDot) sidebarDot.style.backgroundColor = dotColor;
+            if(sidebarTxt) sidebarTxt.innerText = label;
+        }
+
+        async function initCloudSync() {
+            if (typeof __firebase_config === 'undefined') {
+                updateCloudIndicator('offline');
+                return;
+            }
+            try {
+                const firebaseConfig = JSON.parse(__firebase_config);
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                updateCloudIndicator('connecting');
+
+                let userCredential;
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    userCredential = await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    userCredential = await signInAnonymously(auth);
+                }
+
+                if (userCredential && userCredential.user) {
+                    isCloudActive = true;
+                    setupRealtimeListener();
+                }
+            } catch (err) {
+                console.error("Cloud synchronization setup failed:", err);
+                updateCloudIndicator('offline');
+            }
+        }
+
+        // Сохранение текущего глобального состояния в Firebase/LocalStorage
+        async function saveAllDataToCloud(silent = false) {
+            // Кэш в локальном хранилище в любом случае
+            localStorage.setItem('v10_staff', JSON.stringify(staff));
+            localStorage.setItem('v10_zones', JSON.stringify(zones));
+            localStorage.setItem('v10_leaders', JSON.stringify(leaders));
+            localStorage.setItem('v10_services_carousel', JSON.stringify(servicesCarousel));
+            localStorage.setItem('v10_matrix', JSON.stringify(dayTasks));
+            localStorage.setItem('v10_checklists', JSON.stringify(checklists));
+            localStorage.setItem('v10_data2025', JSON.stringify(data2025));
+            localStorage.setItem('v10_data2026', JSON.stringify(data2026));
+
+            if (!isCloudActive) return;
+            try {
+                const stateDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'storeState', 'mainState');
+                await setDoc(stateDocRef, {
+                    staff,
+                    zones,
+                    leaders,
+                    servicesCarousel,
+                    dayTasks,
+                    checklists,
+                    data2025,
+                    data2026,
+                    updatedAt: new Date().toISOString()
+                });
+                if(!silent) {
+                    showToast('Дані синхронізовано з хмарою!');
+                }
+            } catch (err) {
+                console.error("Cloud push failed:", err);
+                updateCloudIndicator('error');
+            }
+        }
+
+        function setupRealtimeListener() {
+            const stateDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'storeState', 'mainState');
+            onSnapshot(stateDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    
+                    if (data.staff) staff = data.staff;
+                    if (data.zones) zones = data.zones;
+                    if (data.leaders) leaders = data.leaders;
+                    if (data.servicesCarousel) servicesCarousel = data.servicesCarousel;
+                    if (data.dayTasks) dayTasks = data.dayTasks;
+                    if (data.checklists) checklists = data.checklists;
+                    if (data.data2025) data2025 = data.data2025;
+                    if (data.data2026) data2026 = data.data2026;
+
+                    localStorage.setItem('v10_staff', JSON.stringify(staff));
+                    localStorage.setItem('v10_zones', JSON.stringify(zones));
+                    localStorage.setItem('v10_leaders', JSON.stringify(leaders));
+                    localStorage.setItem('v10_services_carousel', JSON.stringify(servicesCarousel));
+                    localStorage.setItem('v10_matrix', JSON.stringify(dayTasks));
+                    localStorage.setItem('v10_checklists', JSON.stringify(checklists));
+                    localStorage.setItem('v10_data2025', JSON.stringify(data2025));
+                    localStorage.setItem('v10_data2026', JSON.stringify(data2026));
+
+                    triggerUIRefresh();
+                    updateCloudIndicator('synced');
+                } else {
+                    saveAllDataToCloud(true);
+                }
+            }, (error) => {
+                console.error("Firestore snapshot error:", error);
+                updateCloudIndicator('error');
+            });
+        }
+
+        function triggerUIRefresh() {
+            renderLeaders();
+            renderServices();
+            renderStaffEditor();
+            renderShareTable();
+            renderTrainingTable();
+            renderStrategyHistoryTable();
+            renderInputTable();
+            renderZonesTable();
+            renderDailyAttendance();
+            recalculateDailyPlan();
+            renderShiftsPlanner();
+            renderChecklist();
+            renderTeamCards();
+            if (selectedMemberId) {
+                showMemberDetails(selectedMemberId);
+            }
+            calculateTotals();
+            if (salesChart) {
+                salesChart.data.datasets[0].data = data2025;
+                salesChart.data.datasets[1].data = data2026;
+                salesChart.update();
+            }
+            runAIEngine();
+        }
+
         window.onload = function() {
             if (localStorage.getItem('comfy-theme') === 'dark') {
                 document.body.classList.add('dark-mode');
             }
-            initMatrixFields(); applyAdminUI(); renderLeaders(); renderServices(); 
-            renderStaffEditor(); renderShareTable(); renderTrainingTable(); 
-            renderCalendarTable(); renderMeetingsTable(); renderStrategyHistoryTable(); 
-            renderInputTable(); renderZonesTable(); renderDailyAttendance(); 
-            recalculateDailyPlan(); buildChart(); calculateTotals(); runAIEngine();
-            renderShiftsPlanner(); renderChecklist();
+            initMatrixFields(); 
+            applyAdminUI(); 
+            triggerUIRefresh();
+            buildChart(); 
+            initCloudSync();
         };
 
-        // Theme switcher
         function toggleTheme() {
             document.body.classList.toggle('dark-mode');
             const isDark = document.body.classList.contains('dark-mode');
@@ -1376,10 +2194,9 @@
             }
         }
 
-        // Database export (Backup)
         function exportDatabase() {
             const dump = {
-                staff, zones, leaders, services, tasks, meetings, dayTasks, data2025, data2026, checklists
+                staff, zones, leaders, servicesCarousel, dayTasks, data2025, data2026, checklists
             };
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dump));
             const dlAnchorElem = document.createElement('a');
@@ -1388,52 +2205,50 @@
             dlAnchorElem.click();
         }
 
-        // Database import (Restore)
         function importDatabase(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = async function(e) {
                     try {
                         const dump = JSON.parse(e.target.result);
                         if (dump.staff) {
-                            localStorage.setItem('v10_staff', JSON.stringify(dump.staff));
-                            localStorage.setItem('v10_zones', JSON.stringify(dump.zones));
-                            localStorage.setItem('v10_leaders', JSON.stringify(dump.leaders));
-                            localStorage.setItem('v10_services', JSON.stringify(dump.services));
-                            localStorage.setItem('v10_tasks', JSON.stringify(dump.tasks));
-                            localStorage.setItem('v10_meetings', JSON.stringify(dump.meetings));
-                            localStorage.setItem('v10_matrix', JSON.stringify(dump.dayTasks));
-                            if (dump.data2025) localStorage.setItem('v10_data2025', JSON.stringify(dump.data2025));
-                            if (dump.data2026) localStorage.setItem('v10_data2026', JSON.stringify(dump.data2026));
-                            if (dump.checklists) localStorage.setItem('v10_checklists', JSON.stringify(dump.checklists));
+                            staff = dump.staff;
+                            zones = dump.zones;
+                            leaders = dump.leaders;
+                            dayTasks = dump.dayTasks;
+                            if (dump.servicesCarousel) servicesCarousel = dump.servicesCarousel;
+                            if (dump.data2025) data2025 = dump.data2025;
+                            if (dump.data2026) data2026 = dump.data2026;
+                            if (dump.checklists) checklists = dump.checklists;
                             
-                            alert('Базу даних успішно відновлено! Перезавантаження системи...');
-                            location.reload();
+                            await saveAllDataToCloud(true);
+                            showToast('Базу даних успішно відновлено!');
+                            triggerUIRefresh();
                         } else {
-                            alert('Файл некоректний. Перевірте джерело.');
+                            showToast('Файл некоректний.', 'error');
                         }
                     } catch (err) {
-                        alert('Помилка при читанні JSON-файлу.');
+                        showToast('Помилка читання файлу.', 'error');
                     }
                 };
                 reader.readAsText(input.files[0]);
             }
         }
 
-        // Skills competency level ratings rendering logic
         function getSkillStarsHTML(employeeIndex, skillKey, currentVal) {
             let stars = '';
             for(let level = 1; level <= 4; level++) {
-                let activeClass = level <= currentVal ? 'skill-star' : '';
-                stars += `<span class="${activeClass}" style="cursor:pointer;" onclick="changeSkillValue(${employeeIndex}, '${skillKey}', ${level})">★</span>`;
+                let activeClass = level <= currentVal ? 'skill-star' : 'opacity-30';
+                stars += `<span class="${activeClass} text-sm mr-0.5" style="cursor:pointer;" onclick="changeSkillValue(${employeeIndex}, '${skillKey}', ${level})">★</span>`;
             }
             return stars;
         }
 
-        function changeSkillValue(empIdx, skillKey, val) {
+        async function changeSkillValue(empIdx, skillKey, val) {
             if (!staff[empIdx].skills) staff[empIdx].skills = { script: 1, happy: 1, it: 1, kbt: 1 };
             staff[empIdx].skills[skillKey] = val;
             renderTrainingTable();
+            await saveAllDataToCloud(true); // Авто-синхронизация при изменении навыков
         }
 
         function renderTrainingTable() {
@@ -1446,45 +2261,27 @@
                 
                 tbody.innerHTML += `
                     <tr>
-                        <td><strong>${e.name}</strong> <span class="badge ${e.status==='pro'?'badge-pro':'badge-rookie'}">${e.status.toUpperCase()}</span></td>
-                        <td>
-                            <div style="font-size: 16px;">
-                                ${getSkillStarsHTML(i, 'script', e.skills.script)}
-                            </div>
-                        </td>
-                        <td>
-                            <div style="font-size: 16px;">
-                                ${getSkillStarsHTML(i, 'happy', e.skills.happy)}
-                            </div>
-                        </td>
-                        <td>
-                            <div style="font-size: 16px;">
-                                ${getSkillStarsHTML(i, 'it', e.skills.it)}
-                            </div>
-                        </td>
-                        <td>
-                            <div style="font-size: 16px;">
-                                ${getSkillStarsHTML(i, 'kbt', e.skills.kbt)}
-                            </div>
-                        </td>
+                        <td class="font-bold py-2">${e.name}</td>
+                        <td class="py-2">${getSkillStarsHTML(i, 'script', e.skills.script)}</td>
+                        <td class="py-2">${getSkillStarsHTML(i, 'happy', e.skills.happy)}</td>
+                        <td class="py-2">${getSkillStarsHTML(i, 'it', e.skills.it)}</td>
+                        <td class="py-2">${getSkillStarsHTML(i, 'kbt', e.skills.kbt)}</td>
                     </tr>
                 `;
             });
         }
 
-        function saveTrainingData() {
-            localStorage.setItem('v10_staff', JSON.stringify(staff));
-            alert('Матрицю кваліфікації та навичок успішно збережено!');
+        async function saveTrainingData() {
+            await saveAllDataToCloud();
+            showToast('Матрицю навичок збережено!');
         }
 
-        // Render shift schedule planner logic
         function renderShiftsPlanner() {
             const tbody = document.getElementById('shifts-planner-tbody');
             if(!tbody) return;
             tbody.innerHTML = '';
 
             staff.forEach((e, empIdx) => {
-                // Ensure default shifts grid exists
                 if(!e.shifts || e.shifts.length !== 7) {
                     e.shifts = [true, true, true, true, true, false, false];
                 }
@@ -1493,9 +2290,9 @@
                 for(let dayIdx = 0; dayIdx < 7; dayIdx++) {
                     const isWorking = e.shifts[dayIdx];
                     cellsHTML += `
-                        <td style="text-align:center;">
-                            <button class="shift-status-btn ${isWorking ? 'shift-working' : 'shift-off'}" onclick="toggleShiftDay(${empIdx}, ${dayIdx})">
-                                ${isWorking ? '🟢 Робота' : '⚪ Вих'}
+                        <td style="text-align:center;" class="p-1">
+                            <button class="shift-status-btn ${isWorking ? 'shift-working' : 'shift-off'} py-1 text-[10px]" onclick="toggleShiftDay(${empIdx}, ${dayIdx})">
+                                ${isWorking ? '🟢' : '⚪'}
                             </button>
                         </td>
                     `;
@@ -1503,18 +2300,17 @@
 
                 tbody.innerHTML += `
                     <tr>
-                        <td><strong>${e.name}</strong></td>
+                        <td class="font-semibold p-1 py-2">${e.name}</td>
                         ${cellsHTML}
                     </tr>
                 `;
             });
         }
 
-        function toggleShiftDay(empIdx, dayIdx) {
+        async function toggleShiftDay(empIdx, dayIdx) {
             staff[empIdx].shifts[dayIdx] = !staff[empIdx].shifts[dayIdx];
             renderShiftsPlanner();
             
-            // Auto sync with the active daily attendance panel for current day of week
             const currentShiftDay = shiftPlannerDayMapping[new Date().getDay()];
             activeDailySellers = [];
             staff.forEach(emp => {
@@ -1525,20 +2321,21 @@
             
             renderDailyAttendance();
             recalculateDailyPlan();
+            await saveAllDataToCloud(true); // Авто-сохранение изменений графика
         }
 
-        function saveShiftsData() {
-            localStorage.setItem('v10_staff', JSON.stringify(staff));
-            alert('Робочий графік змін торгової команди успішно збережено!');
+        async function saveShiftsData() {
+            await saveAllDataToCloud();
+            showToast('Графік змін успішно збережено!');
         }
 
-        // Confetti Engine
         let confettiParticles = [];
         let confettiActive = false;
         const confCanvas = document.getElementById('confetti-canvas');
-        const confCtx = confCanvas.getContext('2d');
+        const confCtx = confCanvas ? confCanvas.getContext('2d') : null;
 
         function triggerCelebration() {
+            if(!confCanvas || !confCtx) return;
             confCanvas.style.display = 'block';
             confCanvas.width = window.innerWidth;
             confCanvas.height = window.innerHeight;
@@ -1568,7 +2365,7 @@
         }
 
         function animateConfetti() {
-            if(!confettiActive) return;
+            if(!confettiActive || !confCtx || !confCanvas) return;
             requestAnimationFrame(animateConfetti);
             confCtx.clearRect(0, 0, confCanvas.width, confCanvas.height);
             
@@ -1607,19 +2404,18 @@
             }
         }
 
-        function saveDayTasksMatrix() {
+        async function saveDayTasksMatrix() {
             for(let i=0; i<=6; i++) {
                 dayTasks[i] = document.getElementById(`dt-${i}`).value;
             }
-            localStorage.setItem('v10_matrix', JSON.stringify(dayTasks));
             
             const curDayIdx = new Date().getDay();
             zones.forEach(z => {
                 z.task = dayTasks[curDayIdx] || "Операційне завдання";
             });
-            localStorage.setItem('v10_zones', JSON.stringify(zones));
+            await saveAllDataToCloud();
+            showToast('Тижневу матрицю операцій збережено!');
             renderZonesTable();
-            alert('Матрицю операційних завдань дня успішно оновлено для всіх зон!');
         }
 
         function runAIEngine() {
@@ -1630,15 +2426,16 @@
             staff.forEach(e => {
                 let statusRatio = e.currentPlan > 0 ? (e.pastSales / e.currentPlan) * 100 : 0;
                 if (statusRatio < 75 && e.currentPlan > 0) {
-                    alertHTML += `<div class="ai-alert-item" style="color:var(--comfy-danger); animation: alertFloat 2s ease-in-out infinite alternate;">⚠️ <strong style="text-shadow: 0 0 10px rgba(255,59,48,0.2);">Просадка:</strong> ${e.name} виконав план лише на ${Math.round(statusRatio)}%. AI радить розрахувати стратегію в адмін-панелі.</div>`;
+                    alertHTML += `<div class="ai-alert-item text-comfyDanger">⚠️ <strong>Просадка:</strong> ${e.name} виконав план лише на ${Math.round(statusRatio)}%. ШІ радить налаштувати розвиток.</div>`;
                 }
             });
-            if(alertHTML === '') alertHTML = '<div class="ai-alert-item">✅ Критичних відхилень у торговій команді немає!</div>';
+            if(alertHTML === '') alertHTML = '<div class="ai-alert-item text-comfyGreen">✅ Критичних відхилень у торговій команді не виявлено!</div>';
             container.innerHTML = alertHTML;
         }
 
         function renderZonesTable() {
             const tbody = document.getElementById('zones-table-body');
+            if(!tbody) return;
             tbody.innerHTML = '';
 
             zones.forEach((z, i) => {
@@ -1648,23 +2445,28 @@
 
                 tbody.innerHTML += `
                     <tr>
-                        <td><input type="text" value="${z.zone}" id="zone-title-input-${i}" style="font-weight:700;"></td>
-                        <td><select id="zone-seller-${i}" onchange="updateZoneData(${i})">${sellerOptions}</select></td>
-                        <td><input type="text" value="${currentTaskValue}" id="zone-task-input-${i}" style="font-weight:600; font-size:13px;"></td>
-                        <td>
+                        <td data-label="Товарна Зона"><input type="text" value="${z.zone}" id="zone-title-input-${i}" style="font-weight:700;"></td>
+                        <td data-label="Відповідальний"><select id="zone-seller-${i}" onchange="updateZoneData(${i})">${sellerOptions}</select></td>
+                        <td data-label="Завдання на сьогодні"><input type="text" value="${currentTaskValue}" id="zone-task-input-${i}" style="font-weight:600; font-size:13px;"></td>
+                        <td data-label="Статус виконання">
                             <select id="zone-status-${i}" class="status-select status-select-active ${selectClass}" onchange="changeZoneStatus(${i}, this)">
                                 <option value="В процесі" ${z.status==='В процесі'?'selected':''}>⏳ В процесі</option>
                                 <option value="Виконано" ${z.status==='Виконано'?'selected':''}>🚀 Виконано (Очікує)</option>
                                 <option value="Перевірено" ${z.status==='Перевірено'?'selected':''}>👑 Перевірено</option>
                             </select>
                         </td>
-                        <td class="admin-only">
+                        <td data-label="Дія" class="admin-only">
                             <button class="btn btn-danger" style="padding:6px 10px; margin:0; min-height: 38px; width: auto;" onclick="deleteZoneRow(${i})">❌</button>
                         </td>
                     </tr>
                 `;
             });
             applyAdminUI();
+        }
+
+        function updateZoneData(idx) {
+            const resp = document.getElementById(`zone-seller-${idx}`).value;
+            zones[idx].responsible = resp;
         }
 
         function addNewZoneRow() {
@@ -1674,35 +2476,32 @@
         }
 
         function deleteZoneRow(i) {
-            if(confirm('Видалити цю товарну зону з формату?')) {
+            showConfirm('Формат магазину', 'Видалити цю товарну зону з формату?', async () => {
                 zones.splice(i, 1);
+                await saveAllDataToCloud();
                 renderZonesTable();
-            }
+            });
         }
 
-        function changeZoneStatus(idx, el) {
+        async function saveZonesState() {
+            zones.forEach((z, i) => {
+                const titleInput = document.getElementById(`zone-title-input-${i}`);
+                const taskInput = document.getElementById(`zone-task-input-${i}`);
+                if (titleInput) z.zone = titleInput.value;
+                if (taskInput) z.task = taskInput.value;
+            });
+            await saveAllDataToCloud();
+            showToast('Стан операційних зон збережено!');
+        }
+
+        async function changeZoneStatus(idx, el) {
             zones[idx].status = el.value;
-            localStorage.setItem('v10_zones', JSON.stringify(zones));
+            await saveAllDataToCloud(true);
             renderZonesTable();
             runAIEngine();
         }
 
-        function updateZoneData(idx) {
-            zones[idx].responsible = document.getElementById(`zone-seller-${idx}`).value;
-        }
-
-        function saveZonesState() {
-            zones.forEach((z, idx) => {
-                z.zone = document.getElementById(`zone-title-input-${idx}`).value;
-                z.responsible = document.getElementById(`zone-seller-${idx}`).value;
-                z.task = document.getElementById(`zone-task-input-${idx}`).value;
-                z.status = document.getElementById(`zone-status-${idx}`).value;
-            });
-            localStorage.setItem('v10_zones', JSON.stringify(zones));
-            alert('Дані Формату, зони та персональні завдання успешно збережено!');
-        }
-
-        // Checklist Widget logic
+        // Логика чек-листов
         function switchChecklistTab(tab) {
             currentChecklistTab = tab;
             document.getElementById('chk-tab-open').classList.toggle('active', tab === 'open');
@@ -1729,9 +2528,9 @@
             calculateChecklistProgress();
         }
 
-        function toggleChecklistItem(index) {
+        async function toggleChecklistItem(index) {
             checklists[currentChecklistTab][index].done = !checklists[currentChecklistTab][index].done;
-            localStorage.setItem('v10_checklists', JSON.stringify(checklists));
+            await saveAllDataToCloud(true);
             renderChecklist();
         }
 
@@ -1740,18 +2539,368 @@
             const doneCount = list.filter(item => item.done).length;
             const progress = list.length > 0 ? Math.round((doneCount / list.length) * 100) : 0;
             
-            document.getElementById('checklist-progress-bar').style.width = `${progress}%`;
-            document.getElementById('checklist-counter').innerText = `Виконано: ${progress}% (${doneCount}/${list.length})`;
+            const progressBar = document.getElementById('checklist-progress-bar');
+            const counter = document.getElementById('checklist-counter');
+            if(progressBar) progressBar.style.width = `${progress}%`;
+            if(counter) counter.innerText = `Виконано: ${progress}% (${doneCount}/${list.length})`;
         }
 
-        function resetCurrentChecklist() {
+        async function resetCurrentChecklist() {
             checklists[currentChecklistTab].forEach(item => item.done = false);
-            localStorage.setItem('v10_checklists', JSON.stringify(checklists));
+            await saveAllDataToCloud(true);
             renderChecklist();
+        }
+
+        function renderTeamCards() {
+            const grid = document.getElementById('team-cards-grid');
+            if(!grid) return;
+            grid.innerHTML = '';
+
+            staff.forEach((member) => {
+                const pendingTasks = member.tasks ? member.tasks.filter(t => !t.done).length : 0;
+                const statusClass = member.status === 'pro' ? 'from-amber-500 to-orange-600' : 'from-blue-500 to-cyan-600';
+                
+                grid.innerHTML += `
+                    <div class="bg-white dark:bg-zinc-800 p-4 rounded-2xl border border-slate-100 dark:border-zinc-700/80 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer duration-300 flex flex-col items-center text-center relative overflow-hidden" onclick="showMemberDetails('${member.id}')">
+                        <div class="absolute top-2 right-2 bg-gradient-to-r ${statusClass} text-white font-extrabold text-[9px] px-2 py-0.5 rounded-full uppercase shadow">
+                            ${member.status}
+                        </div>
+                        <div class="w-16 h-16 rounded-full overflow-hidden border-4 border-slate-100 dark:border-zinc-700 mb-3 mt-2 shadow-inner">
+                            <img src="${member.photo || 'https://placehold.co/100x100/45c735/ffffff?text=' + member.name}" class="w-full h-full object-cover">
+                        </div>
+                        <h4 class="font-bold text-slate-800 dark:text-white text-base">${member.name}</h4>
+                        <p class="text-xs text-slate-400 mb-2">Навчання: ${member.topic || 'Скрипти'}</p>
+                        
+                        <div class="flex items-center gap-1.5 bg-slate-50 dark:bg-zinc-900 px-3 py-1 rounded-xl w-full justify-center">
+                            <span class="text-[10px] text-slate-500 dark:text-zinc-400 font-bold">Активні завдання:</span>
+                            <span class="text-xs bg-red-500 text-white font-extrabold rounded-full w-5 h-5 flex items-center justify-center">${pendingTasks}</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function showMemberDetails(id) {
+            selectedMemberId = id;
+            const member = staff.find(m => m.id === id);
+            if(!member) return;
+
+            const panel = document.getElementById('member-detail-panel');
+            panel.classList.remove('hidden');
+
+            document.getElementById('detail-member-photo').src = member.photo || 'https://placehold.co/100x100/45c735/ffffff?text=' + member.name;
+            document.getElementById('detail-member-name').innerText = member.name;
+            const badge = document.getElementById('detail-member-badge');
+            badge.innerText = member.status.toUpperCase();
+            if (member.status === 'pro') {
+                badge.className = "text-xs px-2 py-0.5 rounded-md font-bold text-white uppercase bg-comfyOrange";
+            } else {
+                badge.className = "text-xs px-2 py-0.5 rounded-md font-bold text-white uppercase bg-blue-500";
+            }
+
+            renderMemberTasksAndMeetings(member);
+            panel.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function closeDetailPanel() {
+            document.getElementById('member-detail-panel').classList.add('hidden');
+            selectedMemberId = null;
+        }
+
+        function renderMemberTasksAndMeetings(member) {
+            // Задачи
+            const tasksTbody = document.getElementById('detail-tasks-tbody');
+            tasksTbody.innerHTML = '';
+            if (member.tasks && member.tasks.length > 0) {
+                member.tasks.forEach((task, idx) => {
+                    const statusText = task.done ? '🟢 Виконано' : '⏳ В процесі';
+                    const actionBtn = !task.done ? `<button class="bg-comfyGreen hover:bg-comfyGreenHover text-xs text-white px-2 py-1 rounded-md admin-only" onclick="toggleTaskDone('${member.id}', ${idx})">✓</button>` : '';
+                    tasksTbody.innerHTML += `
+                        <tr class="hover:bg-slate-100/40 dark:hover:bg-zinc-800/40">
+                            <td class="p-2 py-2.5 font-medium ${task.done ? 'line-through opacity-50' : ''}">${task.text}</td>
+                            <td class="p-2 py-2.5 text-slate-400">${task.deadline}</td>
+                            <td class="p-2 py-2.5 font-bold">${statusText}</td>
+                            <td class="p-2 py-2.5 admin-only flex gap-1">
+                                ${actionBtn}
+                                <button class="bg-red-500 text-white text-xs px-2 py-1 rounded-md admin-only" onclick="deleteMemberTask('${member.id}', ${idx})">✕</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } else {
+                tasksTbody.innerHTML = `<tr><td colspan="4" class="text-center text-slate-400 py-4">Немає призначених завдань</td></tr>`;
+            }
+
+            // Встречи One-to-One
+            const meetsTbody = document.getElementById('detail-meetings-tbody');
+            meetsTbody.innerHTML = '';
+            if (member.meetings && member.meetings.length > 0) {
+                member.meetings.forEach((meet, idx) => {
+                    meetsTbody.innerHTML += `
+                        <tr class="hover:bg-slate-100/40 dark:hover:bg-zinc-800/40">
+                            <td class="p-2 py-2.5 font-bold text-comfyGreen">${meet.date}</td>
+                            <td class="p-2 py-2.5">${meet.topic}</td>
+                            <td class="p-2 py-2.5 admin-only">
+                                <button class="bg-red-500 text-white text-xs px-2 py-1 rounded-md admin-only" onclick="deleteMemberMeeting('${member.id}', ${idx})">✕</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } else {
+                meetsTbody.innerHTML = `<tr><td colspan="3" class="text-center text-slate-400 py-4">Зустрічі не заплановані</td></tr>`;
+            }
+            applyAdminUI();
+        }
+
+        async function toggleTaskDone(memberId, taskIdx) {
+            const member = staff.find(m => m.id === memberId);
+            if (member && member.tasks && member.tasks[taskIdx]) {
+                member.tasks[taskIdx].done = true;
+                await saveAllDataToCloud(true);
+                renderTeamCards();
+                showMemberDetails(memberId);
+                showToast('Завдання позначено як виконане!');
+            }
+        }
+
+        async function deleteMemberTask(memberId, taskIdx) {
+            const member = staff.find(m => m.id === memberId);
+            if (member && member.tasks) {
+                member.tasks.splice(taskIdx, 1);
+                await saveAllDataToCloud(true);
+                renderTeamCards();
+                showMemberDetails(memberId);
+                showToast('Завдання успішно видалено!');
+            }
+        }
+
+        async function addMemberTask() {
+            if(!isAdmin) {
+                showToast('Тільки для Керівника!', 'error');
+                return;
+            }
+            const taskInput = document.getElementById('new-member-task-text');
+            const deadlineInput = document.getElementById('new-member-task-deadline');
+            const txt = taskInput.value.trim();
+            const dl = deadlineInput.value.trim() || 'до кінця тижня';
+
+            if (!txt) {
+                showToast('Будь ласка, вкажіть суть завдання!', 'error');
+                return;
+            }
+
+            const member = staff.find(m => m.id === selectedMemberId);
+            if(member) {
+                if(!member.tasks) member.tasks = [];
+                member.tasks.push({ text: txt, deadline: dl, done: false });
+                await saveAllDataToCloud(true);
+                taskInput.value = '';
+                deadlineInput.value = '';
+                renderTeamCards();
+                showMemberDetails(selectedMemberId);
+                showToast('Нове завдання успішно призначено!');
+            }
+        }
+
+        async function deleteMemberMeeting(memberId, meetIdx) {
+            const member = staff.find(m => m.id === memberId);
+            if (member && member.meetings) {
+                member.meetings.splice(meetIdx, 1);
+                await saveAllDataToCloud(true);
+                showMemberDetails(memberId);
+                showToast('Зустріч скасовано!');
+            }
+        }
+
+        async function addMemberMeeting() {
+            if(!isAdmin) {
+                showToast('Тільки для Керівника!', 'error');
+                return;
+            }
+            const dateInput = document.getElementById('new-member-meet-date');
+            const topicInput = document.getElementById('new-member-meet-topic');
+            const dt = dateInput.value.trim();
+            const tp = topicInput.value.trim();
+
+            if (!dt || !tp) {
+                showToast('Будь ласка, заповніть усі поля зустрічі!', 'error');
+                return;
+            }
+
+            const member = staff.find(m => m.id === selectedMemberId);
+            if(member) {
+                if(!member.meetings) member.meetings = [];
+                member.meetings.push({ date: dt, topic: tp });
+                await saveAllDataToCloud(true);
+                dateInput.value = '';
+                topicInput.value = '';
+                showMemberDetails(selectedMemberId);
+                showToast('Нову зустріч 1-on-1 додано в календар!');
+            }
+        }
+
+        // Клиентская интеграция с Gemini API
+        async function askGeminiPrompt(presetType) {
+            let promptText = '';
+            
+            const total2026 = data2026.reduce((a, b) => a + b, 0);
+            const total2025 = data2025.reduce((a, b) => a + b, 0);
+            let teamData = staff.map(e => `${e.name} (план: ${e.currentPlan}грн, факт: ${e.pastSales}грн, статус: ${e.status})`).join(', ');
+
+            if (presetType === 'KPI-анализ') {
+                promptText = `Зроби глибокий та лаконічний KPI-аналіз команди магазину COMFY на основі цих даних: Показники 2026: ${total2026} грн проти 2025: ${total2025} грн. Результати команди: ${teamData}. Дай 3 практичні поради директору, як виконати план по сервісах та страхуванню. Пиши українською мовою.`;
+            } else if (presetType === 'Слабые зоны') {
+                promptText = `Знайди у списку команди COMFY тих, хто сильно відстає від свого плану: ${teamData}. Склади для директора точковий, жорсткий та дієвий план підвищення їхніх продажів на найближчі 3 дні. Пропиши конкретні кроки. Пиши українською мовою.`;
+            } else if (presetType === 'Идеи продаж') {
+                promptText = `Запропонуй 4 революційні ідеї для крос-продажів та страхування техніки Happy-сервіс у роздрібній мережі COMFY. Як мотивувати клієнта взяти страховку на дорогий смартфон чи пральну машину? Напиши лаконічно, українською мовою.`;
+            }
+
+            executeGeminiQuery(promptText);
+        }
+
+        async function sendCustomGeminiQuery() {
+            const input = document.getElementById('gemini-user-input');
+            const query = input.value.trim();
+            if (!query) return;
+            
+            input.value = '';
+            executeGeminiQuery(query);
+        }
+
+        async function executeGeminiQuery(userQuery) {
+            const historyContainer = document.getElementById('gemini-chat-history');
+            
+            historyContainer.innerHTML += `
+                <div class="self-end bg-indigo-600/40 text-white rounded-xl p-2.5 max-w-[85%] border border-indigo-500/20">
+                    <strong>Ви:</strong> ${userQuery}
+                </div>
+            `;
+            historyContainer.scrollTop = historyContainer.scrollHeight;
+
+            const loadingId = "loading-" + Date.now();
+            historyContainer.innerHTML += `
+                <div id="${loadingId}" class="self-start bg-slate-800 text-indigo-300 rounded-xl p-2.5 max-w-[85%] border border-slate-700 italic">
+                    Gemini думає...
+                </div>
+            `;
+            historyContainer.scrollTop = historyContainer.scrollHeight;
+
+            try {
+                const systemPrompt = "Ви — провідний бізнес-консультант роздрібної мережі COMFY. Ваша мета — допомагати керівнику магазину покращувати продажі додаткових сервісів, поклейки скла, налаштувань IT та страхування Happy сервіс. Будуйте відповіді виключно українською мовою, структуруйте їх маркованими списками, пишіть мотивуюче, лаконічно та професійно.";
+                const apiKey = ""; 
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: userQuery }] }],
+                    systemInstruction: {
+                        parts: [{ text: systemPrompt }]
+                    }
+                };
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                const loadingEl = document.getElementById(loadingId);
+                if (loadingEl) loadingEl.remove();
+
+                const candidate = result.candidates?.[0];
+                if (candidate && candidate.content?.parts?.[0]?.text) {
+                    const generatedText = candidate.content.parts[0].text;
+                    const formattedResponse = generatedText.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+                    historyContainer.innerHTML += `
+                        <div class="self-start bg-slate-900 text-slate-100 rounded-xl p-2.5 max-w-[85%] border border-slate-800/80 leading-relaxed shadow">
+                            <strong>Gemini 🤖:</strong><br>${formattedResponse}
+                        </div>
+                    `;
+                } else {
+                    historyContainer.innerHTML += `
+                        <div class="self-start bg-red-950/40 text-red-300 rounded-xl p-2.5 max-w-[85%] border border-red-500/20">
+                            <strong>Помилка:</strong> Не вдалося отримати відповідь від Gemini. Спробуйте ще раз.
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                console.error("Gemini call error:", err);
+                const loadingEl = document.getElementById(loadingId);
+                if (loadingEl) loadingEl.remove();
+
+                historyContainer.innerHTML += `
+                    <div class="self-start bg-red-950/40 text-red-300 rounded-xl p-2.5 max-w-[85%] border border-red-500/20">
+                        <strong>Помилка зв'язку:</strong> ${err.message}. Перевірте інтернет-з'єднання.
+                    </div>
+                `;
+            }
+            historyContainer.scrollTop = historyContainer.scrollHeight;
+        }
+
+        // Логика отчета презентации
+        function openStrategyPresentation() {
+            const modal = document.getElementById('strategy-presentation-modal');
+            if (!modal) return;
+
+            const shopResult = parseFloat(document.getElementById('strat-input-shop').value) || 0;
+            const regionAvg = parseFloat(document.getElementById('strat-input-region').value) || 0;
+            const kpiIndex = regionAvg > 0 ? Math.round((shopResult / regionAvg) * 100) : 100;
+
+            const pShop = document.getElementById('pres-kpi-shop');
+            const pRegion = document.getElementById('pres-kpi-region');
+            const pIndex = document.getElementById('pres-kpi-index');
+            if (pShop) pShop.innerText = shopResult.toLocaleString() + ' ₴';
+            if (pRegion) pRegion.innerText = regionAvg.toLocaleString() + ' ₴';
+            if (pIndex) pIndex.innerText = kpiIndex + '%';
+
+            const bestName = leaders.mGen || '-';
+            const pBestName = document.getElementById('pres-best-name');
+            const pBestPhoto = document.getElementById('pres-best-photo');
+            if (pBestName) pBestName.innerText = bestName;
+            if (pBestPhoto) pBestPhoto.src = leaders.mGenPhoto || 'https://placehold.co/100x100/45c735/ffffff?text=General';
+
+            const goalsText = document.getElementById('strat-goals').value || 'Фокус на Happy-сервісах та підвищенні крос-продажів на 15%';
+            const pGoalsText = document.getElementById('pres-goals-text');
+            if (pGoalsText) pGoalsText.innerText = goalsText;
+
+            const now = new Date();
+            const year = now.getFullYear();
+            const months = ['Січень', 'Лютий', 'Березень', 'Квітень', 'Травень', 'Червень', 'Липень', 'Серпень', 'Вересень', 'Жовтень', 'Листопад', 'Грудень'];
+            const pDate = document.getElementById('presentation-date');
+            if (pDate) pDate.innerText = `${months[now.getMonth()]} ${year} • Панель Керівника COMFY`;
+
+            const presTable = document.getElementById('pres-staff-table');
+            if (presTable) {
+                presTable.innerHTML = '';
+                staff.forEach(e => {
+                    const pendingTasks = e.tasks ? e.tasks.filter(t => !t.done).map(t => t.text).join(', ') : '';
+                    const tasksDisplay = pendingTasks || 'Постійний моніторинг скриптів';
+                    presTable.innerHTML += `
+                        <tr class="border-b border-slate-800 hover:bg-slate-800/20">
+                            <td class="py-3 font-bold text-white">${e.name}</td>
+                            <td class="py-3 text-slate-300">${(e.pastSales || 0).toLocaleString()} ₴</td>
+                            <td class="py-3 text-comfyGreen text-xs font-semibold">${tasksDisplay}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            modal.style.display = 'flex';
+            setTimeout(() => modal.style.opacity = '1', 10);
+        }
+
+        function closeStrategyPresentation() {
+            const modal = document.getElementById('strategy-presentation-modal');
+            if (modal) {
+                modal.style.opacity = '0';
+                setTimeout(() => modal.style.display = 'none', 200);
+            }
         }
 
         function renderDailyAttendance() {
             const container = document.getElementById('daily-attendance-container');
+            if(!container) return;
             container.innerHTML = '';
             staff.forEach(e => {
                 const isChecked = activeDailySellers.includes(e.id) ? 'checked' : '';
@@ -1773,8 +2922,10 @@
         }
 
         function recalculateDailyPlan() {
-            const dailyTarget = parseFloat(document.getElementById('daily-target-input').value) || 0;
-            const hoursRemaining = parseFloat(document.getElementById('hours-left-input').value) || 8;
+            const dailyTargetInput = document.getElementById('daily-target-input');
+            const hoursLeftInput = document.getElementById('hours-left-input');
+            const dailyTarget = dailyTargetInput ? parseFloat(dailyTargetInput.value) || 0 : 0;
+            const hoursRemaining = hoursLeftInput ? parseFloat(hoursLeftInput.value) || 8 : 8;
             const tbody = document.getElementById('daily-calculated-tbody');
             if(!tbody) return;
             tbody.innerHTML = '';
@@ -1812,6 +2963,7 @@
 
         function renderShareTable() {
             const tbody = document.getElementById('share-table-body');
+            if(!tbody) return;
             tbody.innerHTML = '';
             let sortedStaff = [...staff].sort((a, b) => {
                 let ratioA = a.currentPlan > 0 ? (a.pastSales / a.currentPlan) : 0;
@@ -1834,19 +2986,19 @@
             let textReport = '';
             
             if (messengerType === 'telegram') {
-                textReport += `✈️ *ЗВІТ ЩОДО СЕРВІСНОЇ СТРАТЕГІЇ МАГАЗИНУ*\n`;
+                textReport += `✈️ *ЗВІТ ЩОДО СЕРВІСНОЇ СТРАТЕГІЇ МАГАЗИНА*\n`;
                 textReport += `===================================\n`;
                 textReport += `📈 *Результат сервісів 2026:* \`${total2026.toLocaleString()} ₴\`\n\n`;
                 textReport += `🎯 *СТРАТЕГІЯ ПО МАГАЗИНУ:*\n_${goalText}_\n\n`;
-                textReport += `👥 *ПЕРСОНАЛЬНІ РІШЕННЯ ЩОДО КОМАНДИ:*\n_${performerText}_\n`;
+                textReport += `👥 *ПЕРСОНАЛЬНІ РІШЕННЯ ПО КОМАНДІ:*\n_${performerText}_\n`;
                 textReport += `===================================\n`;
-                textReport += `_Звіт згенеровано в Comfy Pro Dashboard_`;
+                textReport += ` _Звіт згенеровано в системі Comfy Pro Dashboard_`;
             } else {
-                textReport += `*ЗВІТ ЩОДО СЕРВІСНОЇ СТРАТЕГІЇ МАГАЗИНУ*\n`;
+                textReport += `*ЗВІТ ЩОДО СЕРВІСНОЇ СТРАТЕГІЇ МАГАЗИНА*\n`;
                 textReport += `-----------------------------------\n`;
                 textReport += `*Результат сервісів 2026:* ${total2026.toLocaleString()} ₴\n\n`;
                 textReport += `*СТРАТЕГІЯ ПО МАГАЗИНУ:*\n${goalText}\n\n`;
-                textReport += `*ПЕРСОНАЛЬНІ РІШЕННЯ ЩОДО КОМАНДИ:*\n${performerText}\n`;
+                textReport += `*ПЕРСОНАЛЬНІ РІШЕННЯ ПО КОМАНДІ:*\n${performerText}\n`;
                 textReport += `-----------------------------------\n`;
                 textReport += `_Згенеровано у Comfy Pro_`;
             }
@@ -1859,7 +3011,7 @@
             document.body.removeChild(tempTextarea);
             
             triggerCelebration();
-            alert(`📋 Копію для ${messengerType === 'telegram' ? 'Telegram' : 'Viber'} завантажено в буфер обміну!`);
+            showToast(`Звіт для ${messengerType === 'telegram' ? 'Telegram' : 'Viber'} успішно скопійовано!`);
         }
 
         function applyAdminUI() {
@@ -1871,6 +3023,11 @@
                     input.disabled = !isAdmin;
                 }
             });
+
+            const serviceEditableElements = document.querySelectorAll('#services-container [contenteditable]');
+            serviceEditableElements.forEach(el => {
+                el.setAttribute('contenteditable', isAdmin ? 'true' : 'false');
+            });
         }
 
         function toggleAdminMode() {
@@ -1879,33 +3036,42 @@
                 if (pass === adminPassword) { 
                     isAdmin = true; 
                     document.body.classList.add('admin-mode'); 
-                    document.getElementById('lock-icon').innerText = '🔓'; 
-                    document.getElementById('lock-text').innerText = 'Керівник: Доступ'; 
+                    const lockIcon = document.getElementById('lock-icon');
+                    const lockText = document.getElementById('lock-text');
+                    if (lockIcon) lockIcon.innerText = '🔓'; 
+                    if (lockText) lockText.innerText = 'Керівник: Доступ'; 
+                    showToast('Панель Керівника активована!');
                 } else if(pass !== null) {
-                    alert('Неправильний пароль!');
+                    showToast('Неправильний пароль!', 'error');
                 }
             } else { 
                 isAdmin = false; 
                 document.body.classList.remove('admin-mode'); 
-                document.getElementById('lock-icon').innerText = '🔒'; 
-                document.getElementById('lock-text').innerText = 'Панель Керівника'; 
+                const lockIcon = document.getElementById('lock-icon');
+                const lockText = document.getElementById('lock-text');
+                if (lockIcon) lockIcon.innerText = '🔒'; 
+                if (lockText) lockText.innerText = 'Панель Керівника'; 
                 showSection('dashboard'); 
+                closeDetailPanel();
             }
-            applyAdminUI(); renderServices(); renderStaffEditor(); renderShareTable(); 
-            renderTrainingTable(); renderCalendarTable(); renderMeetingsTable(); 
-            renderStrategyHistoryTable(); renderZonesTable(); runAIEngine();
-            renderShiftsPlanner();
+            applyAdminUI(); 
+            triggerUIRefresh();
         }
 
         function renderInputTable() {
-            const tbody = document.getElementById('chart-data-inputs'); tbody.innerHTML = '';
+            const tbody = document.getElementById('chart-data-inputs'); 
+            if(!tbody) return;
+            tbody.innerHTML = '';
             monthsLabels.forEach((month, idx) => {
-                tbody.innerHTML += `<tr><td>${month}</td><td><input type="number" value="${data2025[idx]}" id="val-25-${idx}" oninput="updateChartFromInputs()"></td><td><input type="number" value="${data2026[idx]}" id="val-26-${idx}" oninput="updateChartFromInputs()"></td></tr>`;
+                // Изменен oninput на onchange для предотвращения потери фокуса при вводе
+                tbody.innerHTML += `<tr><td>${month}</td><td><input type="number" value="${data2025[idx]}" id="val-25-${idx}" onchange="updateChartFromInputs()"></td><td><input type="number" value="${data2026[idx]}" id="val-26-${idx}" onchange="updateChartFromInputs()"></td></tr>`;
             });
         }
         
         function buildChart() {
-            const ctx = document.getElementById('salesYearlyChart').getContext('2d');
+            const canvasEl = document.getElementById('salesYearlyChart');
+            if(!canvasEl) return;
+            const ctx = canvasEl.getContext('2d');
             const isDark = document.body.classList.contains('dark-mode');
             
             salesChart = new Chart(ctx, {
@@ -1943,7 +3109,7 @@
             });
         }
         
-        function updateChartFromInputs() {
+        async function updateChartFromInputs() {
             monthsLabels.forEach((_, idx) => { 
                 data2025[idx] = parseFloat(document.getElementById(`val-25-${idx}`).value) || 0; 
                 data2026[idx] = parseFloat(document.getElementById(`val-26-${idx}`).value) || 0; 
@@ -1952,17 +3118,20 @@
             salesChart.data.datasets[1].data = data2026; 
             salesChart.update(); 
             calculateTotals();
+            await saveAllDataToCloud(true); // Авто-синхронизация значений графиков при потере фокуса
         }
         
         function calculateTotals() {
             let total2025 = data2025.reduce((a, b) => a + b, 0); 
             let displayTotal2026 = data2026.reduce((a, b) => a + b, 0);
-            document.getElementById('total-2025-view').innerText = total2025.toLocaleString() + ' ₴'; 
-            document.getElementById('total-2026-view').innerText = displayTotal2026.toLocaleString() + ' ₴';
+            const view2025 = document.getElementById('total-2025-view');
+            const view2026 = document.getElementById('total-2026-view');
+            if(view2025) view2025.innerText = total2025.toLocaleString() + ' ₴'; 
+            if(view2026) view2026.innerText = displayTotal2026.toLocaleString() + ' ₴';
             let total2026Comp = 0, comp25 = 0; 
             data2026.forEach((v, i) => { if (v > 0) { total2026Comp += v; comp25 += data2025[i]; } });
             const yoyView = document.getElementById('yoy-percentage-view');
-            if (comp25 > 0) { 
+            if (comp25 > 0 && yoyView) { 
                 let yoy = ((total2026Comp - comp25) / comp25) * 100; 
                 yoyView.innerText = `${yoy >= 0 ? '▲ +' : '▼ '}${yoy.toFixed(1)}%`; 
                 yoyView.style.color = yoy >= 0 ? 'var(--comfy-green)' : 'var(--comfy-danger)'; 
@@ -1970,29 +3139,85 @@
         }
         
         function renderServices() {
-            const container = document.getElementById('services-container'); container.innerHTML = '';
-            services.forEach((s, i) => { 
-                container.innerHTML += `
-                    <div class="service-card">
-                        <h4>${s.title}</h4>
-                        <div class="admin-only" style="margin-bottom: 10px;">
-                            <input type="text" value="${s.title}" id="service-title-input-${i}">
+            const container = document.getElementById('services-container');
+            if(!container) return;
+            container.innerHTML = '';
+            
+            servicesCarousel.forEach((cat, catIdx) => {
+                let itemsHTML = '';
+                cat.items.forEach((item, itemIdx) => {
+                    itemsHTML += `
+                        <div class="carousel-service-item">
+                            <div class="item-header">
+                                <span class="item-name" contenteditable="${isAdmin}" onblur="updateCarouselData(${catIdx}, ${itemIdx}, 'name', this.innerText)">${item.name}</span>
+                                <span class="item-price" contenteditable="${isAdmin}" onblur="updateCarouselData(${catIdx}, ${itemIdx}, 'price', this.innerText)">${item.price}</span>
+                            </div>
+                            <p class="item-work">
+                                <strong>Як працює:</strong> 
+                                <span contenteditable="${isAdmin}" onblur="updateCarouselData(${catIdx}, ${itemIdx}, 'work', this.innerText)">${item.work}</span>
+                            </p>
+                            ${isAdmin ? `
+                            <div style="text-align: right; margin-top: 5px;" class="admin-only">
+                                <button class="btn btn-danger" style="padding: 2px 6px; font-size: 10px; min-height: 20px; width: auto; margin: 0; border:none;" onclick="deleteCarouselItem(${catIdx}, ${itemIdx})">Видалити</button>
+                            </div>` : ''}
                         </div>
-                        <div class="desc-text">${s.desc}</div>
-                        <textarea id="service-desc-edit-${i}" class="admin-only" rows="3" style="margin-top:10px;">${s.desc}</textarea>
-                    </div>`; 
+                    `;
+                });
+                
+                container.innerHTML += `
+                    <div class="service-carousel-card">
+                        <div class="card-category-header">
+                            <span class="category-icon" contenteditable="${isAdmin}" onblur="updateCarouselCategoryIcon(${catIdx}, this.innerText)">${cat.icon}</span>
+                            <h3 contenteditable="${isAdmin}" onblur="updateCarouselCategoryName(${catIdx}, this.innerText)">${cat.category}</h3>
+                        </div>
+                        <div class="carousel-services-list">
+                            ${itemsHTML}
+                        </div>
+                        ${isAdmin ? `
+                        <div style="margin-top: auto; padding-top: 10px;" class="admin-only">
+                            <button class="btn btn-success" style="padding: 6px 12px; font-size: 11px; min-height: 28px; width: 100%;" onclick="addCarouselItem(${catIdx})">➕ Додати послугу</button>
+                        </div>` : ''}
+                    </div>
+                `;
             });
             applyAdminUI();
         }
+
+        async function updateCarouselData(catIdx, itemIdx, field, val) {
+            servicesCarousel[catIdx].items[itemIdx][field] = val;
+            await saveAllDataToCloud(true); // Сохраняем в облако сразу после потери фокуса в услуге
+        }
+
+        async function updateCarouselCategoryIcon(catIdx, val) {
+            servicesCarousel[catIdx].icon = val;
+            await saveAllDataToCloud(true);
+        }
+
+        async function updateCarouselCategoryName(catIdx, val) {
+            servicesCarousel[catIdx].category = val;
+            await saveAllDataToCloud(true);
+        }
+
+        function addCarouselItem(catIdx) {
+            servicesCarousel[catIdx].items.push({ 
+                name: 'Нова послуга', 
+                price: '100 ₴', 
+                work: 'Опис процедури надання послуги та її головні переваги для клієнта.' 
+            });
+            renderServices();
+        }
+
+        function deleteCarouselItem(catIdx, itemIdx) {
+            showConfirm('Каталог послуг', 'Видалити цю послугу з каталогу?', () => {
+                servicesCarousel[catIdx].items.splice(itemIdx, 1);
+                renderServices();
+            });
+        }
         
-        function saveServicesData() { 
-            services.forEach((s, i) => { 
-                s.title = document.getElementById(`service-title-input-${i}`).value; 
-                s.desc = document.getElementById(`service-desc-edit-${i}`).value; 
-            }); 
-            localStorage.setItem('v10_services', JSON.stringify(services)); 
+        async function saveServicesData() { 
+            await saveAllDataToCloud();
             renderServices(); 
-            alert('Сервіси оновлено!'); 
+            showToast('Усі зміни в каталозі послуг успішно збережено!');
         }
         
         function renderLeaders() { 
@@ -2011,18 +3236,20 @@
             }); 
         }
         
-        function saveLeadersData() { 
+        async function saveLeadersData() { 
             const keys = ['mGen', 'mHappy', 'mInstall', 'dGen', 'dHappy', 'dInstall']; 
             keys.forEach(k => { 
                 leaders[k] = document.getElementById(`inp-name-${k.replace(/[A-Z]/g, m => '-' + m.toLowerCase())}`).value; 
             }); 
-            localStorage.setItem('v10_leaders', JSON.stringify(leaders)); 
+            await saveAllDataToCloud();
             renderLeaders(); 
-            alert('Лідери оновлені!'); 
+            showToast('Переможців та лідерів збережено!');
         }
         
         function renderStaffEditor() {
-            const tbody = document.getElementById('staff-editor-table'); tbody.innerHTML = '';
+            const tbody = document.getElementById('staff-editor-table'); 
+            if(!tbody) return;
+            tbody.innerHTML = '';
             staff.forEach((emp, i) => { 
                 tbody.innerHTML += `
                     <tr>
@@ -2048,7 +3275,7 @@
         }
         
         function addNewSeller() { 
-            const n = prompt("ПІБ співробітника:"); 
+            const n = prompt("ПІБ нового продавця:"); 
             if (!n) return; 
             staff.push({ 
                 id: 'e_' + Date.now(), 
@@ -2060,9 +3287,10 @@
                 topic: 'Скрипти', 
                 score: 'Не вивчав', 
                 skills: { script: 1, happy: 1, it: 1, kbt: 1 }, 
-                shifts: [true, true, true, true, true, false, false] 
+                shifts: [true, true, true, true, true, false, false],
+                tasks: [],
+                meetings: []
             }); 
-            localStorage.setItem('v10_staff', JSON.stringify(staff)); 
             activeDailySellers.push(staff[staff.length-1].id); 
             renderStaffEditor(); 
             renderShareTable(); 
@@ -2070,20 +3298,25 @@
             recalculateDailyPlan(); 
             renderShiftsPlanner();
             renderTrainingTable();
+            renderTeamCards();
+            showToast('Нового співробітника додано у команду!');
         }
         
         function deleteSeller(i) { 
-            if(confirm('Видалити співробітника?')) { 
+            showConfirm('Торгова команда', 'Видалити цього продавця із системи?', async () => { 
                 staff.splice(i, 1); 
-                localStorage.setItem('v10_staff', JSON.stringify(staff)); 
+                await saveAllDataToCloud();
                 renderStaffEditor(); 
                 renderShareTable(); 
                 renderShiftsPlanner();
                 renderTrainingTable();
-            } 
+                renderTeamCards();
+                closeDetailPanel();
+                showToast('Співробітника видалено.');
+            }); 
         }
         
-        function saveStaffEditor() { 
+        async function saveStaffEditor() { 
             staff.forEach((emp, i) => { 
                 emp.name = document.getElementById(`edit-emp-name-${i}`).value; 
                 if(isAdmin) emp.status = document.getElementById(`edit-emp-status-${i}`).value; 
@@ -2091,91 +3324,52 @@
                 emp.pastSales = parseFloat(document.getElementById(`edit-emp-past-${i}`).value)||0; 
                 emp.currentPlan = parseFloat(document.getElementById(`edit-emp-plan-${i}`).value)||0; 
             }); 
-            localStorage.setItem('v10_staff', JSON.stringify(staff)); 
+            await saveAllDataToCloud();
             renderStaffEditor(); 
             renderShareTable(); 
+            renderTeamCards();
             runAIEngine(); 
-            alert('Дані штату успішно збережено!'); 
+            showToast('Персональні плани та штат успішно збережено!');
         }
         
-        function runAutoDistribution() { 
+        async function runAutoDistribution() { 
             const t = parseFloat(document.getElementById('total-target').value)||0; 
             let tw = staff.reduce((s,e)=>s+e.weight,0); 
             staff.forEach(e=>{ 
                 e.currentPlan = Math.round(tw > 0 ? (e.weight / tw) * t : 0); 
             }); 
-            localStorage.setItem('v10_staff', JSON.stringify(staff)); 
+            await saveAllDataToCloud();
             renderStaffEditor(); 
             renderShareTable(); 
-            alert('План успішно розподілено!'); 
-        }
-        
-        function renderCalendarTable() { 
-            const tbody = document.getElementById('calendar-table-body'); tbody.innerHTML = ''; 
-            tasks.forEach((t, i) => { 
-                tbody.innerHTML += `
-                    <tr>
-                        <td><input type="text" value="${t.date}" id="task-date-${i}"></td>
-                        <td><input type="text" value="${t.text}" id="task-text-${i}"></td>
-                        <td><input type="text" value="${t.ghost}" id="task-ghost-${i}"></td>
-                        <td class="admin-only">
-                            <button class="btn btn-danger" style="padding:4px; min-height:38px; width:auto; margin:0;" onclick="tasks.splice(${i},1);renderCalendarTable()">❌</button>
-                        </td>
-                    </tr>`; 
-            }); 
-            applyAdminUI(); 
-        }
-        
-        function addNewTaskRow() { tasks.push({ date: '1-1', text: 'Нова задача', ghost: 'Усі' }); renderCalendarTable(); }
-        
-        function renderMeetingsTable() { 
-            const tbody = document.getElementById('meetings-table-body'); tbody.innerHTML = ''; 
-            meetings.forEach((m, i) => { 
-                tbody.innerHTML += `
-                    <tr>
-                        <td><input type="text" value="${m.date}" id="meet-date-${i}"></td>
-                        <td><input type="text" value="${m.name}" id="meet-name-${i}"></td>
-                        <td><input type="text" value="${m.цель}" id="meet-goal-${i}"></td>
-                        <td class="admin-only">
-                            <button class="btn btn-danger" style="padding:4px; min-height:38px; width:auto; margin:0;" onclick="meetings.splice(${i},1);renderMeetingsTable()">❌</button>
-                        </td>
-                    </tr>`; 
-            }); 
-            applyAdminUI(); 
-        }
-        
-        function addNewMeetingRow() { meetings.push({ date: '12:00', name: 'Хто', цель: 'Тема' }); renderMeetingsTable(); }
-        
-        function saveCalendarAndMeetings() { 
-            localStorage.setItem('v10_tasks', JSON.stringify(tasks)); 
-            localStorage.setItem('v10_meetings', JSON.stringify(meetings)); 
-            alert('Календар та зустрічі збережено!'); 
+            showToast('Плани успішно розподілено на команду!');
         }
         
         function renderStrategyHistoryTable() { 
-            const tbody = document.getElementById('strat-staff-history-table'); tbody.innerHTML = ''; 
+            const tbody = document.getElementById('strat-staff-history-table'); 
+            if(!tbody) return;
+            tbody.innerHTML = ''; 
             staff.forEach((e, i) => { 
                 tbody.innerHTML += `<tr><td><strong>${e.name}</strong></td><td><input type="number" value="${e.history2 || 0}" id="strat-hist2-${i}"></td><td><input type="number" value="${e.history3 || 0}" id="strat-hist3-${i}"></td></tr>`; 
             }); 
             applyAdminUI(); 
         }
         
-        // STYLISH AI CALCULATION ANIMATION SEQUENCE
         function triggerAISteps() {
             const scanOverlay = document.getElementById('ai-scanning-screen');
+            if(!scanOverlay) return;
             scanOverlay.classList.add('active');
             
-            // Simulating AI step-by-step thinking visual process
             setTimeout(() => {
                 generateAutoStrategy();
                 scanOverlay.classList.remove('active');
                 triggerCelebration();
+                showToast('Рішення сформовано за допомогою ШІ-аналітики!');
             }, 1800);
         }
 
         function generateAutoStrategy() { 
             if (!staff || staff.length === 0) {
-                document.getElementById('strat-low-performers').value = "Немає даних про штат для аналізу.";
+                document.getElementById('strat-low-performers').value = "Немає даних по штату для ШІ-аналізу.";
                 return;
             }
 
@@ -2186,19 +3380,17 @@
             let totalStorePlan = staff.reduce((sum, e) => sum + e.currentPlan, 0);
             let storeRatio = totalStorePlan > 0 ? (totalStoreSales / totalStorePlan) * 100 : 0;
 
-            // General evaluation
             if (storeRatio < 80) {
-                generalStoreStrategy += `• Магазин відстає від плану (всього ${Math.round(storeRatio)}%). Пріоритет №1: Екстрена мобілізація команди, щоденний контроль середнього чеку та обов'язковий продаж страховок Happy-сервісу до кожного КБТ/смартфону.\n`;
+                generalStoreStrategy += `• Магазин суттєво відстає від плану (всього ${Math.round(storeRatio)}%). Пріоритет №1: Екстрена мобілізація команди, щогодинний контроль середнього чека та обов'язкова пропозиція страховок Happy-сервісу до кожного девайсу.\n`;
             } else if (storeRatio < 100) {
-                generalStoreStrategy += `• Магазин близький до виконання плану (${Math.round(storeRatio)}%). Фокус на підвищенні крос-продажів (скло/налаштування) та підтягуванні слабких працівників.\n`;
+                generalStoreStrategy += `• Магазин близький до виконання плану (${Math.round(storeRatio)}%). Фокус на підвищенні кросс-продажів (скло/налаштування) та підтягуванні слабких результатів продавців.\n`;
             } else {
-                generalStoreStrategy += `• План перевиконано (${Math.round(storeRatio)}%)! Стратегія: утримати лідерство в регіоні, матеріально заохотити Pro-продавців.\n`;
+                generalStoreStrategy += `• План перевиконано (${Math.round(storeRatio)}%)! Стратегія: утримати впевнене лідерство у регіоні, матеріально заохотити Pro-продавців магазину.\n`;
             }
 
             staff.forEach(e => {
                 const ratio = e.currentPlan > 0 ? Math.round((e.pastSales / e.currentPlan) * 100) : 0;
                 
-                // Analyze skills to find weak spots
                 let weakestSkillKey = "script";
                 let lowestVal = 5;
                 if (e.skills) {
@@ -2219,48 +3411,52 @@
 
                 const weakSkillName = skillNames[weakestSkillKey] || "Загальні навички";
 
-                // Action generation based on ratio
                 if (ratio < 75) {
                     underperformersCount++;
-                    lowPerformerActions += `❌ ${e.name} (виконання ${ratio}% - КРИТИЧНО):\n`;
+                    lowPerformerActions += `❌ ${e.name} (виконання ${ratio}% - КРИТИЧНО отстає):\n`;
                     
                     if (lowestVal <= 2) {
                         lowPerformerActions += `  • ПРИЧИНА: Слабкі знання у сфері "${weakSkillName}" (${lowestVal} зірки).\n`;
-                        lowPerformerActions += `  • РІШЕННЯ: Зняти з лінії на 1 годину для проходження мікронавчання. Провести 3 рольові гри з керівником. Закріпити за ним Pro-наставника на 3 дні. Встановити персональний щоденний ліміт продажів цієї послуги.\n`;
+                        lowPerformerActions += `  • РІШЕННЯ: Зняти з лінії на 1 годину для проходження мікронавчання. Провести 3 рольові гри з Керівником. Закріпити за ним Pro-наставника на 3 дні. Встановити персональний щоденний ліміт продажів цієї послуги.\n`;
                     } else {
-                        lowPerformerActions += `  • ПРИЧИНА: Проблема з активністю на торговій зоні, попри хороші теоретичні знання (${lowestVal} зірки).\n`;
-                        lowPerformerActions += `  • РІШЕННЯ: Провести One-to-One бесіду з виявлення мотиваційних бар'єрів. Керівнику провести спільну зміну на зоні протягом 2 годин, аналізуючи кожну відмову клієнта.\n`;
+                        lowPerformerActions += `  • ПРИЧИНА: Проблема з активністю в торговій зоні, незважаючи на хороші теоретичні знання (${lowestVal} зірки).\n`;
+                        lowPerformerActions += `  • РІШЕННЯ: Провести One-to-One бесіду для виявлення мотиваційних бар'єрів. Керівнику провести спільну зміну в зоні протягом 2 годин, аналізуючи кожну відмову клієнта.\n`;
                     }
                     lowPerformerActions += `\n`;
                 } else if (ratio < 90) {
                     lowPerformerActions += `⚠️ ${e.name} (виконання ${ratio}% - ТРЕБА ПІДТЯГНУТИ):\n`;
-                    lowPerformerActions += `  • РІШЕННЯ: Сфокусувати увагу на продажах продукту "${weakSkillName}". Поставити завдання зробити мінімум 2 успішні продажі до кінця тижня. Перевірити проходження тестів на внутрішньому порталі.\n\n`;
+                    lowPerformerActions += `  • РЕШЕННЯ: Сфокусувати увагу на продажах продукту "${weakSkillName}". Поставити завдання зробити щонайменше 2 успішні продажі до кінця тижня. Перевірити проходження тестів на внутрішньому порталі.\n\n`;
                 } else {
-                    // Performing well
-                    lowPerformerActions += `✅ ${e.name} (виконання ${ratio}% - ЛІДЕР):\n`;
-                    lowPerformerActions += `  • РІШЕННЯ: Оголосити подяку на ранкових зборах. Дозволити поділитися лайфхаками з командою. Використовувати як наставника для відстаючих.\n\n`;
+                    lowPerformerActions += `✅ ${e.name} (виконання ${ratio}% - ЛІДЕР КОМАНДИ):\n`;
+                    lowPerformerActions += `  • РЕШЕННЯ: Оголосити подяку на ранкових зборах. Запропонувати поділитися лайфхаками з командою. Використати як наставника для слабких продавців.\n\n`;
                 }
             });
 
             if (underperformersCount === 0) {
                 generalStoreStrategy += "• Вся команда працює стабільно, критичних просадок немає!";
             } else {
-                generalStoreStrategy += `• Наявні ${underperformersCount} відстаючих працівників. Необхідно негайно впровадити точкові плани розвитку.`;
+                generalStoreStrategy += `• Виявлено ${underperformersCount} відстаючих співробітників. Необхідно негайно впровадити точкові плани розвитку.`;
             }
 
             document.getElementById('strat-goals').value = generalStoreStrategy;
             document.getElementById('strat-low-performers').value = lowPerformerActions;
-            document.getElementById('strat-done').value = `• Проведено автоматичний аналіз поточної матриці навичок та відсотку виконання планів у розрізі кожного співробітника.\n• Сформовано оперативні рекомендації з корекції результатів.`;
+            document.getElementById('strat-done').value = `• Проведено автоматичний аналіз поточної матриці навичок та відсотка виконання планів у розрізі кожного співробітника.\n• Сформовано оперативні рекомендації щодо корекції результатів.`;
         }
         
-        function saveStrategy() { 
-            localStorage.setItem('v10_strat_goals', document.getElementById('strat-goals').value); 
-            alert('Стратегію збережено!'); 
+        async function saveStrategy() { 
+            staff.forEach((e, i) => {
+                const hist2 = document.getElementById(`strat-hist2-${i}`);
+                const hist3 = document.getElementById(`strat-hist3-${i}`);
+                if (hist2) e.history2 = parseFloat(hist2.value) || 0;
+                if (hist3) e.history3 = parseFloat(hist3.value) || 0;
+            });
+            await saveAllDataToCloud();
+            showToast('Стратегію успішно збережено!');
         }
         
-        function saveTomorrowPlan() { 
-            localStorage.setItem('v10_tom_focus', document.getElementById('tom-focus-input').value); 
-            alert('План дня збережено!'); 
+        async function saveTomorrowPlan() { 
+            await saveAllDataToCloud();
+            showToast('Денний план збережено в систему!');
         }
         
         function showSection(id) { 
@@ -2273,14 +3469,86 @@
             if(targetSec) targetSec.classList.add('active'); 
             if(targetMenu) targetMenu.classList.add('active-menu-item'); 
             
-            document.getElementById('sidebar').classList.remove('open'); 
-            document.getElementById('sidebar-overlay').classList.remove('active'); 
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if(sidebar) sidebar.classList.remove('open'); 
+            if(overlay) overlay.classList.remove('active'); 
         }
         
         function toggleMobileMenu() { 
-            document.getElementById('sidebar').classList.toggle('open'); 
-            document.getElementById('sidebar-overlay').classList.toggle('active'); 
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if(sidebar) sidebar.classList.toggle('open'); 
+            if(overlay) overlay.classList.toggle('active'); 
         }
+
+        // Прив'язка функцій до глобальної області видимості window
+        window.toggleTheme = toggleTheme;
+        window.toggleMobileMenu = toggleMobileMenu;
+        window.showSection = showSection;
+        window.toggleAdminMode = toggleAdminMode;
+        window.triggerCelebration = triggerCelebration;
+        window.uploadLeaderPhoto = uploadLeaderPhoto;
+        window.saveLeadersData = saveLeadersData;
+        window.exportDatabase = exportDatabase;
+        window.importDatabase = importDatabase;
+        window.saveZonesState = saveZonesState;
+        window.addNewZoneRow = addNewZoneRow;
+        window.deleteZoneRow = deleteZoneRow;
+        window.changeZoneStatus = changeZoneStatus;
+        window.switchChecklistTab = switchChecklistTab;
+        window.toggleChecklistItem = toggleChecklistItem;
+        window.resetCurrentChecklist = resetCurrentChecklist;
+        window.saveDayTasksMatrix = saveDayTasksMatrix;
+        window.saveServicesData = saveServicesData;
+        window.updateCarouselData = updateCarouselData;
+        window.updateCarouselCategoryIcon = updateCarouselCategoryIcon;
+        window.updateCarouselCategoryName = updateCarouselCategoryName;
+        window.addCarouselItem = addCarouselItem;
+        window.deleteCarouselItem = deleteCarouselItem;
+        window.saveStaffEditor = saveStaffEditor;
+        window.addNewSeller = addNewSeller;
+        window.deleteSeller = deleteSeller;
+        window.runAutoDistribution = runAutoDistribution;
+        window.saveTrainingData = saveTrainingData;
+        window.toggleShiftDay = toggleShiftDay;
+        window.saveShiftsData = saveShiftsData;
+        window.exportReportToClipboard = exportReportToClipboard;
+        window.updateChartFromInputs = updateChartFromInputs;
+        window.triggerAISteps = triggerAISteps;
+        window.saveStrategy = saveStrategy;
+        window.recalculateDailyPlan = recalculateDailyPlan;
+        window.toggleDailySeller = toggleDailySeller;
+        window.saveTomorrowPlan = saveTomorrowPlan;
+        window.changeSkillValue = changeSkillValue;
+        window.updateZoneData = updateZoneData;
+        window.showMemberDetails = showMemberDetails;
+        window.closeDetailPanel = closeDetailPanel;
+        window.addMemberTask = addMemberTask;
+        window.deleteMemberTask = deleteMemberTask;
+        window.toggleTaskDone = toggleTaskDone;
+        window.addMemberMeeting = addMemberMeeting;
+        window.deleteMemberMeeting = deleteMemberMeeting;
+        window.askGeminiPrompt = askGeminiPrompt;
+        window.sendCustomGeminiQuery = sendCustomGeminiQuery;
+        window.openStrategyPresentation = openStrategyPresentation;
+        window.closeStrategyPresentation = closeStrategyPresentation;
     </script>
+<div class="wrap">
+    <h1>Панель дня — К14</h1>
+    
+    <div class="toolbar" style="margin: 20px 0; display: flex; gap: 10px;">
+        <label class="btn" style="padding: 10px; background: #2ABD13; color: white; cursor: pointer; border-radius: 5px;">
+            Завантажити звіт: <input type="file" id="fileInput" accept=".csv, .xlsx" style="display:none;">
+        </label>
+    </div>
+
+    <div id="sellers" class="sellers-grid">
+        </div>
+</div>
+
+    <script src="aksy.js"></script>
+</body>
+</html>
 </body>
 </html>
